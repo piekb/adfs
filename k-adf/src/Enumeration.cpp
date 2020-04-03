@@ -31,6 +31,7 @@
 #include "Encodings.h"
 #include "Exists.h"
 #include "Utils.h"
+#include <iostream>
 
 #if defined(SAT_MINISAT)
 #include "MiniSATSolver.h"
@@ -158,7 +159,9 @@ std::vector<std::vector<int>> enumerate_adm(ADF & adf) {
 	interpretations.push_back(interpretation);
 	vector<vector<int>> larger_clauses = larger_interpretation(adf, interpretation);
 	solver.add_clauses(larger_clauses);
+	print_clauses(larger_clauses);
 	while (true) {
+		std::cout << "hello";
 		bool sat = solver.solve();
 		if (!sat) break;
 		vector<int> model;
@@ -171,6 +174,9 @@ std::vector<std::vector<int>> enumerate_adm(ADF & adf) {
 				model.push_back(Interpretation::Undefined);
 			}
 		}
+
+		print_interpretation(adf,model);
+		std::cout << "-----";
 		SAT_Solver new_solver = SAT_Solver();
 		vector<vector<int>> adm_clauses = adm_verification(adf, model);
 		new_solver.add_clauses(adm_clauses);

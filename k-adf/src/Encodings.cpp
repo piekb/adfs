@@ -28,6 +28,8 @@
 
 #include "Encodings.h"
 #include "Constants.h"
+#include "Utils.h"
+#include <iostream>
 
 using namespace std;
 
@@ -40,11 +42,14 @@ vector<vector<int>> cf_interpretation(ADF & adf) {
 	for (int i = 0; i < adf.condition_clauses.size(); i++) {
 		clauses.insert(clauses.end(), adf.condition_clauses[i].begin(), adf.condition_clauses[i].end());
 	}
+	//print_clauses(clauses);
 	for (int i = 0; i < adf.statements.size(); i++) {
 		vector<int> clause;
+		//std::cout << -adf.statement_true_var[adf.statements[i]] << " ";
 		clause.push_back(-adf.statement_true_var[adf.statements[i]]);
 		int val = (adf.conditions[i].root->neg ? -1 : 1) * adf.conditions[i].root->value;
 		clause.push_back(val);
+		//std::cout << val << " ";
 		clauses.push_back(clause);
 		clause.clear();
 		for (int j = 0; j < adf.range[adf.statements[i]].size(); j++) {
@@ -56,9 +61,11 @@ vector<vector<int>> cf_interpretation(ADF & adf) {
 	}
 	for (int i = 0; i < adf.statements.size(); i++) {
 		vector<int> clause;
+		//std::cout << -adf.statement_false_var[adf.statements[i]] << " ";
 		clause.push_back(-adf.statement_false_var[adf.statements[i]]);
 		int val = (adf.conditions[i].root->neg ? -1 : 1) * adf.conditions[i].root->value;
 		clause.push_back(-val);
+		//std::cout << -val << " ";
 		clauses.push_back(clause);
 		clause.clear();
 		for (int j = 0; j < adf.range[adf.statements[i]].size(); j++) {
@@ -95,6 +102,7 @@ vector<vector<int>> larger_interpretation(ADF & adf, std::vector<int> & interpre
 		}
 	}
 	clauses.push_back(undef_clause);
+	//print_clauses(clauses);
 	return clauses;
 }
 
@@ -107,6 +115,9 @@ vector<vector<int>> adm_verification(ADF & adf, vector<int> & interpretation) {
 	for (int i = 0; i < adf.statement_clauses.size(); i++) {
 		clauses.insert(clauses.end(), adf.statement_clauses[i].begin(), adf.statement_clauses[i].end());
 	}
+	//cout << i << " ";
+//	print_clauses(clauses);
+//	std::cout << "------";
 	for (int i = 0; i < interpretation.size(); i++) {
 		if (interpretation[i] == Interpretation::True) {
 			vector<int> clause;

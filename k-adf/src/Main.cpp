@@ -220,6 +220,7 @@ int main(int argc, char **argv)
         } else if (sem == "nai") {
             interpretations = Enumeration::enumerate_nai(adf);
         } else if (sem == "adm") {
+//		cout << k;
             if (k == 0) {
                 interpretations = Enumeration::enumerate_adm_bipolar(adf);
             } else if (k < max_kbip_distance) {

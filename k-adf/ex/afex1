@@ -1,2 +1,9 @@
-adfex8
+s(a).
+s(b).
+s(c).
+s(d).
+ac(a,a).
+ac(b,and(neg(a),neg(c))).
+ac(c,neg(b)).
+ac(d,d).
 
