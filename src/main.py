@@ -7,11 +7,34 @@ import os
 # import re
 # import spacy
 # from pathlib import Path
+import sympy
+from sympy import *
+import re
 
 class Argument:
     name = ""
     ac = ""
 
+def other():
+    pattern = 'abs'
+    test_string = 'abs'
+    result = re.match(pattern, test_string)
+
+    if result:
+        print(pattern)
+
+def rewrite():
+    test = 'not(and(a,b))'
+    pat = 'not\((.+)\)'
+    found = re.match(pat,test)
+    comp = re.compile(pat)
+    sub = comp.search(test)
+    print(sub.group(1))
+
+    if found:
+        print("yay!")
+
+    # x,y = sympy.symbols('x,y')
 
 def main(argv):
     print("hello!")
@@ -22,25 +45,24 @@ def main(argv):
     part = os.path.split(cur_path)[0]
     # print(sys.argv[1])
 
-    # user_in = input("please enter file name:")
-    user_in = 'adfex2'
+    # user_in = input("please enter file name: ")
+    user_in = 'adfex5'
     path = part+'/ex/'+user_in
     # print(path)
 
     arguments = []
+    # initial_claim = input("please enter initial claim: ")
 
     with open(path, 'r') as f:
         contents = f.readlines()
         # print(contents)
+        size = 0
         for line in contents:
-            # print(i)
-            # print(line[0:2])
-            # print(line[2:(len(line) - 3)])
-            # print('---')
             if (line[0]=='s'):
                 a = Argument()
                 a.name = line[2]
                 arguments.append(a)
+                size+=1
             elif (line[0:2]=='ac'):
                 # print(line[3])
                 for a in arguments:
@@ -56,9 +78,7 @@ def main(argv):
             print(a.ac)
             print('---')
 
-
-
-
+    rewrite()
     print("bye!")
 
 if __name__ == '__main__':
