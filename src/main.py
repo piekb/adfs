@@ -26,6 +26,12 @@ class Argument:
 
     # print(Not(And(x,a)))
 
+def eval_exp(exp, v, set_args):
+    for i in enumerate(v):
+        if (v[i]=='t'):
+            new = exp.subs({set_args[i]: True})
+
+
 def rewrite(ac):
     # ac = 'neg(and(or(a,b),c))'
     neg = ac.replace('neg','Not')
@@ -33,7 +39,7 @@ def rewrite(ac):
     last = also.replace('or','Or')
     # print(last)
 
-    ## There must be a better way to do this
+    ## There must be a better way to do this, but for now this works.
     return Not(Not(last))
 
 def main(argv):
@@ -78,12 +84,14 @@ def main(argv):
         for a in arguments:
             print(a.name)
             print(a.ac)
+            print(a.ac.subs({set_args[1]: True}))
+            print(a.ac.atoms())
             print('---')
 
     # for argu in set_args:
     #     print(Not(argu))
 
-    ## initial_claim = input("please enter initial claim: ")
+    ##initial_claim = input("please enter initial claim: ")
 
 
     print("bye!")
