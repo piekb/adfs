@@ -2,39 +2,39 @@
 
 import sys
 import os
-# import logic
-# import json
-# import re
-# import spacy
-# from pathlib import Path
+import json
 import sympy
 from sympy import *
+from sympy.logic import Not,And,Or
+from sympy.abc import A
 import re
 
 class Argument:
     name = ""
     ac = ""
 
-def other():
-    pattern = 'abs'
-    test_string = 'abs'
-    result = re.match(pattern, test_string)
+# def reg():
+    # test = 'not(and(a,b))'
+    # pat = 'not\((.+)\)'
+    # found = re.match(pat,test)
+    # comp = re.compile(pat)
+    # sub = comp.search(test)
+    # print(sub.group(1))
 
-    if result:
-        print(pattern)
+    # if found:
+    #     print("yay!")
 
-def rewrite():
-    test = 'not(and(a,b))'
-    pat = 'not\((.+)\)'
-    found = re.match(pat,test)
-    comp = re.compile(pat)
-    sub = comp.search(test)
-    print(sub.group(1))
+    # print(Not(And(x,a)))
 
-    if found:
-        print("yay!")
+def rewrite(ac):
+    # ac = 'neg(and(or(a,b),c))'
+    neg = ac.replace('neg','Not')
+    also = neg.replace('and','And')
+    last = also.replace('or','Or')
+    # print(last)
 
-    # x,y = sympy.symbols('x,y')
+    ## There must be a better way to do this
+    return Not(Not(last))
 
 def main(argv):
     print("hello!")
@@ -45,40 +45,47 @@ def main(argv):
     part = os.path.split(cur_path)[0]
     # print(sys.argv[1])
 
-    # user_in = input("please enter file name: ")
-    user_in = 'adfex5'
+    ## user_in = input("please enter file name: ")
+    user_in = 'adfex2'
     path = part+'/ex/'+user_in
     # print(path)
 
     arguments = []
-    # initial_claim = input("please enter initial claim: ")
+    set_args = []
 
     with open(path, 'r') as f:
         contents = f.readlines()
-        # print(contents)
         size = 0
         for line in contents:
             if (line[0]=='s'):
                 a = Argument()
                 a.name = line[2]
+                arg = sympy.symbols('{}'.format(line[2]))
+
+                set_args.append(arg)
+
                 arguments.append(a)
                 size+=1
             elif (line[0:2]=='ac'):
-                # print(line[3])
                 for a in arguments:
-                    # print(a.name)
                     if (a.name == line[3]):
                         # print(line[5:(len(line)-3)])
-                        a.ac = line[5:(len(line)-3)]
+                        a.ac = rewrite(line[5:(len(line)-3)])
             else:
                 print("what?")
+
         print('arguments:')
         for a in arguments:
             print(a.name)
             print(a.ac)
             print('---')
 
-    rewrite()
+    # for argu in set_args:
+    #     print(Not(argu))
+
+    ## initial_claim = input("please enter initial claim: ")
+
+
     print("bye!")
 
 if __name__ == '__main__':
