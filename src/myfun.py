@@ -1,3 +1,8 @@
+## Global variables, classes, and functions
+
+arguments = []
+size = 0
+
 ## Takes expression and interpretation, and returns evaluated expression under interpretation
 def eval_exp(exp, v, args):
     new = exp
@@ -14,18 +19,27 @@ def eval_exp(exp, v, args):
 ## For whole set of arguments! So not necessarily >=i
 def gamma(v,args):
     new = ''
-    print(v)
+    # print(v)
     for a in args:
         update = eval_exp(a.ac, v, args)
-        print(update)
+        # print(update)
         if update == True:
             new = new + 't'
         elif update == False:
             new = new + 'f'
         else:
             new = new + 'u'
-    print(new)
-    # return new
+    # print(new)
+    return new
+
+## v(a): returns truth value of argument arg in interpretation v
+def find_in(v,arg,arguments):
+    tv = 0
+    for i, val in enumerate(v):
+        if arguments[i].name == arg.name:
+            tv = val
+
+    return tv
 
 def print_full_args(set):
     for a in set:
@@ -35,3 +49,7 @@ def print_full_args(set):
 def print_args(set):
     for a in set:
         print(a.name)
+
+def print_acs(set):
+    for a in set:
+        print(a)

@@ -26,3 +26,24 @@
 #     print("yay!")
 
 # print(Not(And(x,a)))
+
+## == c with ac = b | ~a
+# testarg = arguments[2]
+# print(testarg.name)
+# print(testarg.ac)
+# print("now removed:")
+# try:
+#     test = arguments
+#     test.remove(testarg)
+#     myfun.print_full_args(test)
+# except ValueError:
+#     print("Given argument does not exist")
+
+## Returns a version of a-prime without the "current" argument, to avoid double checking
+# def exclude(a_prime, a):
+#     try:
+#         rest_a_prime = a_prime
+#         rest_a_prime.remove(a)
+#         return rest_a_prime
+#     except ValueError:
+#         print("Given argument does not exist")

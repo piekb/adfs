@@ -49,7 +49,7 @@ def main(argv):
 
     with open(path, 'r') as c:
         contents = c.readlines()
-        size = 0
+        # size = 0
         for line in contents:
             if line[0] == 's':
                 a = Argument()
@@ -57,7 +57,7 @@ def main(argv):
                 arg = sympy.symbols('{}'.format(line[2]))
                 a.sym = arg
                 arguments.append(a)
-                size += 1
+                myfun.size += 1
             elif line[0:2] == 'ac':
                 for a in arguments:
                     if a.name == line[3]:
@@ -69,7 +69,14 @@ def main(argv):
         print('arguments:')
         myfun.print_full_args(arguments)
 
-    initial_claim = input("please enter initial claim: ")
+    initial_claim = input("Please enter initial claim: ")
+    while True:
+        if re.match("^[f,t,u]*$", initial_claim) and len(initial_claim) == myfun.size:
+            break
+        else:
+            print("Error! Input should be {size} characters from t,f, or u. No spaces".format(size=myfun.size))
+            initial_claim = input("Please enter initial claim: ")
+
     # print(myfun.eval_exp(arguments[0].ac,initial_claim,set_args))
     # f.gamma(initial_claim, arguments)
 
@@ -79,6 +86,14 @@ def main(argv):
     print('---')
 
     steps.forward(initial_claim,a_prime,arguments)
+
+    # print(myfun.find_in(myfun.gamma(initial_claim, arguments), arguments[0], arguments))
+    # print(steps.find_msat(arguments[0]))
+    # g = steps.just_one_gamma('fuu',initial_claim,arguments[0],arguments)
+    # print("a = just one gamma? ")
+    # print(g)
+    # for c in arguments[0].ac.atoms():
+    #     print(c)
 
     print("bye!")
 
