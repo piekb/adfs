@@ -41,7 +41,7 @@ def main(argv):
     # print(sys.argv[1])
 
     ## user_in = input("please enter file name: ")
-    user_in = 'adfex2'
+    user_in = 'adfex1'
     path = part + '/ex/' + user_in
     # print(path)
 
@@ -80,12 +80,14 @@ def main(argv):
     # print(myfun.eval_exp(arguments[0].ac,initial_claim,set_args))
     # f.gamma(initial_claim, arguments)
 
+    print(gamma(initial_claim, arguments))
+
     a_prime = steps.check_info(initial_claim,'uuu',arguments)
     print("recently presented:")
     myfun.print_args(a_prime)
     print('---')
 
-    steps.forward(initial_claim,a_prime,arguments)
+    steps.forward(initial_claim, a_prime, arguments)
 
     # print(myfun.find_in(myfun.gamma(initial_claim, arguments), arguments[0], arguments))
     # print(steps.find_msat(arguments[0]))

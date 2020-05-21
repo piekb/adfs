@@ -7,7 +7,6 @@ from sympy.logic import Not, And, Or
 import re
 
 import myfun
-# as f
 from myfun import *
 
 known_msats = {}
@@ -44,14 +43,14 @@ def find_msat(a):
     if '{}'.format(a) in known_msats.keys():
         msat = known_msats['{}'.format(a)]
     else:
-        msat = input("Please give an msat for arg {arg} with condition = {ac}: ".format(arg=a.name, ac=a.ac))
+        msat = input("Please give an msat for arg {arg} with condition = {ac} such that gamma(v)({arg}) = v({arg}): ".format(arg=a.name, ac=a.ac))
         while True:
-            if re.match("^[f,t,u]*$", msat) and len(msat) == myfun.size:
+            if re.match("^[f,t,u]*$", msat) and len(msat) == myfun.size: #and myfun.find_in(v, arg, arguments) == myfun.find_in(gamma(v, arguments), arg, arguments)
                 known_msats['{}'.format(a)] = msat
                 break
             else:
                 print("Error! Input should be {size} characters from t,f, or u. No spaces".format(size=myfun.size))
-                msat = input("Please give an msat for arg {arg} with condition = {ac}: ".format(arg=a.name, ac=a.ac))
+                msat = input("Please give an msat for arg {arg} with condition = {ac} such that gamma(v)({arg}) = v({arg}): ".format(arg=a.name, ac=a.ac))
 
     return msat
 
@@ -80,7 +79,7 @@ def just_one_gamma(msat, v, arg, arguments):
 
 
 def third(arg, v, arguments, a_prime):
-    # print('third condition')
+    print('third condition')
     msat_arg = find_msat(arg)
     if just_one_gamma(msat_arg, v, arg, arguments):
         return False
@@ -93,7 +92,7 @@ def third(arg, v, arguments, a_prime):
 
 
 def fourth(a_prime, v, arg, arguments):
-    # print('fourth condition')
+    print('fourth condition')
     for a in a_prime:
         msat_ai = find_msat(a)
         val = myfun.find_in(msat_ai, arg, arguments)
