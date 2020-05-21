@@ -5,42 +5,31 @@ import os
 import json
 import sympy
 from sympy import *
-from sympy.logic import Not,And,Or
-from sympy.abc import A
+from sympy.logic import Not, And, Or
 import re
+import myfun
+from myfun import *
+import steps
+from steps import *
+
+# arguments = []
 
 class Argument:
     name = ""
     ac = ""
-
-# def reg():
-    # test = 'not(and(a,b))'
-    # pat = 'not\((.+)\)'
-    # found = re.match(pat,test)
-    # comp = re.compile(pat)
-    # sub = comp.search(test)
-    # print(sub.group(1))
-
-    # if found:
-    #     print("yay!")
-
-    # print(Not(And(x,a)))
-
-def eval_exp(exp, v, set_args):
-    for i in enumerate(v):
-        if (v[i]=='t'):
-            new = exp.subs({set_args[i]: True})
-
+    sym = 0
 
 def rewrite(ac):
     # ac = 'neg(and(or(a,b),c))'
-    neg = ac.replace('neg','Not')
-    also = neg.replace('and','And')
-    last = also.replace('or','Or')
+    neg = ac.replace('neg', 'Not')
+    also = neg.replace('and', 'And')
+    last = also.replace('or', 'Or')
     # print(last)
 
     ## There must be a better way to do this, but for now this works.
+    ## Alternatively, And(True,last) or Or(False,last)
     return Not(Not(last))
+
 
 def main(argv):
     print("hello!")
@@ -53,48 +42,46 @@ def main(argv):
 
     ## user_in = input("please enter file name: ")
     user_in = 'adfex2'
-    path = part+'/ex/'+user_in
+    path = part + '/ex/' + user_in
     # print(path)
 
     arguments = []
-    set_args = []
 
-    with open(path, 'r') as f:
-        contents = f.readlines()
+    with open(path, 'r') as c:
+        contents = c.readlines()
         size = 0
         for line in contents:
-            if (line[0]=='s'):
+            if line[0] == 's':
                 a = Argument()
                 a.name = line[2]
                 arg = sympy.symbols('{}'.format(line[2]))
-
-                set_args.append(arg)
-
+                a.sym = arg
                 arguments.append(a)
-                size+=1
-            elif (line[0:2]=='ac'):
+                size += 1
+            elif line[0:2] == 'ac':
                 for a in arguments:
-                    if (a.name == line[3]):
+                    if a.name == line[3]:
                         # print(line[5:(len(line)-3)])
-                        a.ac = rewrite(line[5:(len(line)-3)])
+                        a.ac = rewrite(line[5:(len(line) - 3)])
             else:
                 print("what?")
 
         print('arguments:')
-        for a in arguments:
-            print(a.name)
-            print(a.ac)
-            print(a.ac.subs({set_args[1]: True}))
-            print(a.ac.atoms())
-            print('---')
+        myfun.print_full_args(arguments)
 
-    # for argu in set_args:
-    #     print(Not(argu))
+    initial_claim = input("please enter initial claim: ")
+    # print(myfun.eval_exp(arguments[0].ac,initial_claim,set_args))
+    # f.gamma(initial_claim, arguments)
 
-    ##initial_claim = input("please enter initial claim: ")
+    a_prime = steps.check_info(initial_claim,'uuu',arguments)
+    print("recently presented:")
+    myfun.print_args(a_prime)
+    print('---')
 
+    steps.forward(initial_claim,a_prime,arguments)
 
     print("bye!")
+
 
 if __name__ == '__main__':
     main(sys.argv)
