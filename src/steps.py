@@ -12,8 +12,10 @@ from ext import *
 
 known_msats = {}
 
+
 def finish():
     print("agreement found!")
+    found = True
 
 
 # Check if oldv <= v between each step (so all v's are in fact comparable!)
@@ -92,7 +94,6 @@ def find_msat(a, v, args):
     return msat
 
 ## Returns if there is any conflict in the "rest" of a-prime without the first defined value.
-## Check if msatai!=msataj also a problem if msataj == u?
 def no_conflict(a_prime, v, arg, arguments):
     val_ai = myfun.find_in(v, arg, arguments)
     for a in a_prime:
@@ -154,7 +155,7 @@ def delta(v, a_prime, arg, arguments):
     truth_val = myfun.find_in(v, arg, arguments)
     if truth_val == 't' or truth_val == 'f':
         if not (arg in a_prime):
-            print("first case in delta")
+            # print("first case in delta")
             myfun.print_args(a_prime)
             update = truth_val
         elif myfun.phi(arg.ac, v, arguments) == True or myfun.phi(arg.ac, v, arguments) == False:

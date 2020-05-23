@@ -92,6 +92,7 @@ def main(argv):
     second = steps.forward(first, a_prime, arguments)
     a_prime = steps.check_info(second, first, arguments)
 
+    print("-------------------")
 
     # print(myfun.gamma('ttf', arguments))
 
