@@ -1,12 +1,12 @@
 # !/usr/bin/python3
 
 import sys
-import os
+import os, re
 import json
 import sympy
 from sympy import *
 from sympy.logic import Not, And, Or
-import re
+# import re
 import myfun
 from myfun import *
 import steps
@@ -41,7 +41,7 @@ def main(argv):
     # print(sys.argv[1])
 
     ## user_in = input("please enter file name: ")
-    user_in = 'adfex1'
+    user_in = 'adfex2'
     path = part + '/ex/' + user_in
     # print(path)
 
@@ -87,15 +87,24 @@ def main(argv):
     myfun.print_args(a_prime)
     print('---')
 
-    steps.forward(initial_claim, a_prime, arguments)
+    # steps.forward(initial_claim, a_prime, arguments)
+
+    # print(myfun.gamma('ttf', arguments))
 
     # print(myfun.find_in(myfun.gamma(initial_claim, arguments), arguments[0], arguments))
     # print(steps.find_msat(arguments[0]))
-    # g = steps.just_one_gamma('fuu',initial_claim,arguments[0],arguments)
+    # g = steps.just_one_gamma('uuu',initial_claim,arguments[0],arguments)
     # print("a = just one gamma? ")
     # print(g)
     # for c in arguments[0].ac.atoms():
     #     print(c)
+
+    test1 = 'hello'
+    test2 = test1[:3] + 'Fu ' + test1[3:]
+    print(test2)
+
+    steps.gen_msats(arguments[1], initial_claim, arguments)
+
 
     print("bye!")
 

@@ -4,7 +4,7 @@ arguments = []
 size = 0
 
 ## Takes expression and interpretation, and returns evaluated expression under interpretation
-def eval_exp(exp, v, args):
+def phi(exp, v, args):
     new = exp
     for i, val in enumerate(v):
         if val == 't':
@@ -17,11 +17,11 @@ def eval_exp(exp, v, args):
 
 ## Gamma with args as objects with ac, set_args as symbols
 ## For whole set of arguments! So not necessarily >=i
-def gamma(v,args):
+def gamma(v, args):
     new = ''
     # print(v)
     for a in args:
-        update = eval_exp(a.ac, v, args)
+        update = phi(a.ac, v, args)
         # print(update)
         if update == True:
             new = new + 't'
@@ -38,8 +38,17 @@ def find_in(v,arg,arguments):
     for i, val in enumerate(v):
         if arguments[i].name == arg.name:
             tv = val
-
     return tv
+    # return v[dexin(v, arg, arguments)]
+
+# index() but for arguments in v
+def dexin(v,arg,arguments):
+    index = 0
+    for i, val in enumerate(v):
+        if arguments[i].name == arg.name:
+            index = i
+
+    return index
 
 def print_full_args(set):
     for a in set:
