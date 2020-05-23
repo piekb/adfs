@@ -87,24 +87,31 @@ def main(argv):
     myfun.print_args(a_prime)
     print('---')
 
-    # steps.forward(initial_claim, a_prime, arguments)
+    first = steps.forward(initial_claim, a_prime, arguments)
+    a_prime = steps.check_info(first, initial_claim, arguments)
+    second = steps.forward(first, a_prime, arguments)
+    a_prime = steps.check_info(second, first, arguments)
+
 
     # print(myfun.gamma('ttf', arguments))
 
     # print(myfun.find_in(myfun.gamma(initial_claim, arguments), arguments[0], arguments))
     # print(steps.find_msat(arguments[0]))
-    # g = steps.just_one_gamma('uuu',initial_claim,arguments[0],arguments)
+    # g = steps.just_one_gamma(initial_claim, arguments[0], arguments)
     # print("a = just one gamma? ")
+    # print(g)
+    #
+    # g = steps.just_one_gamma(initial_claim, arguments[1], arguments)
+    # print("b = just one gamma? ")
     # print(g)
     # for c in arguments[0].ac.atoms():
     #     print(c)
-
-    test1 = 'hello'
-    test2 = test1[:3] + 'Fu ' + test1[3:]
-    print(test2)
-
-    steps.gen_msats(arguments[1], initial_claim, arguments)
-
+    #
+    # test1 = 'hello'
+    # test2 = test1[:3] + 'Fu ' + test1[3:]
+    # print(test2)
+    #
+    # steps.gen_msats(arguments[2], initial_claim, arguments)
 
     print("bye!")
 

@@ -1,4 +1,3 @@
-
 inters = []
 
 # The main recursive method to print all possible interpretations

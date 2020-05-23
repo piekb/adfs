@@ -34,12 +34,7 @@ def gamma(v, args):
 
 ## v(a): returns truth value of argument arg in interpretation v
 def find_in(v,arg,arguments):
-    tv = 0
-    for i, val in enumerate(v):
-        if arguments[i].name == arg.name:
-            tv = val
-    return tv
-    # return v[dexin(v, arg, arguments)]
+    return v[dexin(v, arg, arguments)]
 
 # index() but for arguments in v
 def dexin(v,arg,arguments):

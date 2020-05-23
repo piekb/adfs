@@ -11,10 +11,10 @@ import ext
 from ext import *
 
 known_msats = {}
-# a_prime = []
 
 def finish():
     print("agreement found!")
+
 
 # Check if oldv <= v between each step (so all v's are in fact comparable!)
 def check_info(v, oldv, arguments):
@@ -35,97 +35,100 @@ def check_info(v, oldv, arguments):
 
     # forward(v,a_prime,args)
 
+## Returns the set of mSAT interpretations from a list of SAT interpretations.
+def min_info(sats):
+    msats = []
+    d = dict.fromkeys(sats, 1)
+    for i, sat in enumerate(sats):
+        count = 0
+        for j, tv in enumerate(sat):
+            if tv != 'u':
+                count += 1
+        d['{}'.format(sat)] = count
+
+    sort = sorted(d, key=d.get)
+    # last = sort[0]
+    for w in sort:
+        # print(w, d[w])
+        if d[w] == d[sort[0]]:
+            msats.append(w)
+
+    return msats
+
+## Generates set of minimal satisfiable interpretations for argument a under interpretation v.
 def gen_msats(a, v, arguments):
     inters = ext.gen_inters(myfun.size)
-    print('before:')
-    print(inters)
+    # print('before:')
     sats = []
-    print(sats)
     arg_in = myfun.dexin(v, a, arguments)
 
     for i, inter in enumerate(inters):
-        newsat = inter[:arg_in] + 'u' + inter[arg_in:]
-        print(newsat)
-        sats[i] = newsat
-
-    # for i, sat in enumerate(sats):
-    #     v_a = myfun.find_in(v, a, arguments)
-    #     gam_a = myfun.find_in(myfun.gamma(sat, arguments), a, arguments)
-    #     if v_a != gam_a:
-    #
-    #         sats.remove(sat)
-
-    # print(inters)
+        sat = inter[:arg_in] + 'u' + inter[arg_in:]
+        v_a = myfun.find_in(v, a, arguments)
+        gam_a = myfun.find_in(myfun.gamma(sat, arguments), a, arguments)
+        # print("for arg {arg} v({arg}) = {v}".format(arg = a.name, v = v_a))
+        # print("for arg {arg} gamma({arg}) = {v}".format(arg=a.name, v=gam_a))
+        if v_a == gam_a:
+            sats.append(sat)
     # print(sats)
 
-def msat(a, phi_a, v, args):
+    msats = min_info(sats)
+    # print(msats)
+    return msats
+
+def find_msat(a, v, args):
+    phi_a = myfun.phi(a.ac, v, args)
     if '{}'.format(a) in known_msats.keys():
         msat = known_msats['{}'.format(a)]
     else:
-        gen_msats(a, v, args)
-        if phi_a == True or phi_a == False: #or len(msats[a,v])==0:
+        msats = gen_msats(a, v, args)
+        if phi_a == True or phi_a == False or len(msats) == 0:
+            print("here now")
             msat = just_one_gamma(v, a, args)
         else:
-            # msat = msats[a,v][0]
-            msat = just_one_gamma(v, a, args)
+            msat = msats[0]
         known_msats['{}'.format(a)] = msat
+    # print('msat for arg {a} = {msat}'.format(a=a.name, msat=msat))
     return msat
-
-
-## Find one mSAT for one argument
-def find_msat(a):
-    # msat = ''
-    if '{}'.format(a) in known_msats.keys():
-        msat = known_msats['{}'.format(a)]
-    else:
-        msat = input("Please give an msat w for arg {arg} with condition = {ac} such that gamma(w)({arg}) = v({arg}): ".format(arg=a.name, ac=a.ac))
-        while True:
-            if re.match("^[f,t,u]*$", msat) and len(msat) == myfun.size: #and myfun.find_in(v, a, arguments) == myfun.find_in(gamma(v, arguments), a, arguments)
-                known_msats['{}'.format(a)] = msat
-                break
-            else:
-                print("Error! Input should be {size} characters from t,f, or u. No spaces".format(size=myfun.size))
-                msat = input("Please give an msat w for arg {arg} with condition = {ac} such that gamma(w)({arg}) = v({arg}): ".format(arg=a.name, ac=a.ac))
-
-    return msat
-
 
 ## Returns if there is any conflict in the "rest" of a-prime without the first defined value.
 ## Check if msatai!=msataj also a problem if msataj == u?
-def no_conflict(a_prime, val_ai, arg, arguments):
+def no_conflict(a_prime, v, arg, arguments):
+    val_ai = myfun.find_in(v, arg, arguments)
     for a in a_prime:
-        msat_aj = find_msat(a)
+        msat_aj = find_msat(a, v, arguments)
         val_aj = myfun.find_in(msat_aj, arg, arguments)
-        if val_aj != 'u' and val_aj != val_ai:
-            print(val_aj)
+        if val_aj != 'u' and val_ai != 'u' and val_aj != val_ai:
+            print('here is conflict: val_ai = {ai}, val_aj={aj} for arg {arg} on arg {a}'.format(ai=val_ai, aj=val_aj, arg=arg.name, a=a.name))
             return False
 
     return True
 
+
 ## Returns {a to Gamma(v)(a)}
 def just_one_gamma(v, arg, arguments):
-    msat = ''
-    for i, value in enumerate(msat):
-        # if arguments[i] != arg and value != 'u':
-        #     return False
-        # elif arguments[i] == arg and value != myfun.find_in(myfun.gamma(v, arguments), arg, arguments):
-        #     return False
-        if arguments[i] == arg:
-            msat[i] = myfun.find_in(myfun.gamma(v, arguments), arg, arguments)
-        else:
-            msat[i] = 'u'
+    u = myfun.size * 'u'
+
+    new = myfun.find_in(myfun.gamma(v, arguments), arg, arguments)
+    # print('new = {}'.format(new))
+
+    arg_in = myfun.dexin(v, arg, arguments)
+    msat = u[:arg_in] + new + u[arg_in:-1]
+    # if msat.count('u') == myfun.size:
+    #     print("help me please")
     return msat
 
-
 def third(arg, v, arguments, a_prime):
+    phi_a = myfun.phi(arg.ac, v, arguments)
     print('third condition')
-    msat_arg = find_msat(arg)
+    msat_arg = find_msat(arg, v, arguments)
     if msat_arg == just_one_gamma(v, arg, arguments):
         return False
     else:
-        for c in arg.ac.atoms():
-            val_a_c = myfun.find_in(msat_arg, c, arguments)
-            if not no_conflict(a_prime, val_a_c, c, arguments):
+        for c in phi_a.atoms():
+            # val_a_c = myfun.find_in(msat_arg, c, arguments)
+            if not no_conflict(a_prime, v, c, arguments):
+                print("- conflict found -")
                 return False
     return True
 
@@ -133,19 +136,25 @@ def third(arg, v, arguments, a_prime):
 def fourth(a_prime, v, arg, arguments):
     print('fourth condition')
     for a in a_prime:
-        msat_ai = find_msat(a)
+        msat_ai = find_msat(a, v, arguments)
+        print("msat for {a} is: {msat}".format(a=a.name, msat=msat_ai))
+        # print(msat_ai)
         val = myfun.find_in(msat_ai, arg, arguments)
+
+        ## Clean up, now there's a double finding val in v
         if val == 't' or val == 'f':
-            if no_conflict(a_prime, val, arg, arguments):
+            if no_conflict(a_prime, v, arg, arguments):
                 return True, msat_ai
     return False, 0
 
 
 def delta(v, a_prime, arg, arguments):
+    # print("for arg {}".format(arg.name))
     update = ''
     truth_val = myfun.find_in(v, arg, arguments)
     if truth_val == 't' or truth_val == 'f':
         if not (arg in a_prime):
+            print("first case in delta")
             myfun.print_args(a_prime)
             update = truth_val
         elif myfun.phi(arg.ac, v, arguments) == True or myfun.phi(arg.ac, v, arguments) == False:
@@ -164,17 +173,18 @@ def delta(v, a_prime, arg, arguments):
 
     return update
 
-
 ## Forward move
 ## Evaluate AC of all a in A-prime
 def forward(v, a_prime, args):
     updated_acs = []
     for a in a_prime:
         updated_acs.append(myfun.phi(a.ac, v, args))
-    myfun.print_acs(updated_acs)
+    # myfun.print_acs(updated_acs)
 
     out = ''
     for a in args:
         out = out + delta(v, a_prime, a, args)
 
+    print("final delta:")
     print(out)
+    return out

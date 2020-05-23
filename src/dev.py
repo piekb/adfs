@@ -47,3 +47,26 @@
 #         return rest_a_prime
 #     except ValueError:
 #         print("Given argument does not exist")
+
+
+## Find one mSAT for one argument
+# def give_msat(a):
+#     msat = ''
+#     if '{}'.format(a) in known_msats.keys():
+#         msat = known_msats['{}'.format(a)]
+#     else:
+#         msat = input(
+#             "Please give an msat w for arg {arg} with condition = {ac} such that gamma(w)({arg}) = v({arg}): ".format(
+#                 arg=a.name, ac=a.ac))
+#         while True:
+#             if re.match("^[f,t,u]*$", msat) and len(
+#                     msat) == myfun.size:  # and myfun.find_in(v, a, arguments) == myfun.find_in(gamma(v, arguments), a, arguments)
+#                 known_msats['{}'.format(a)] = msat
+#                 break
+#             else:
+#                 print("Error! Input should be {size} characters from t,f, or u. No spaces".format(size=myfun.size))
+#                 msat = input(
+#                     "Please give an msat w for arg {arg} with condition = {ac} such that gamma(w)({arg}) = v({arg}): ".format(
+#                         arg=a.name, ac=a.ac))
+#
+#     return msat
