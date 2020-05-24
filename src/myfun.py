@@ -1,27 +1,65 @@
-## Global variables, classes, and functions
+from sympy import simplify
 
+## Global variables, classes, and functions
 arguments = []
 size = 0
 
-## Takes expression and interpretation, and returns evaluated expression under interpretation
-def phi(exp, v, args):
-    new = exp
-    for i, val in enumerate(v):
-        if val == 't':
-            new = new.subs({args[i].sym: True})
-        elif val == 'f':
-            new = new.subs({args[i].sym: False})
 
-    # print(new)
+def finish():
+    print("agreement found!")
+    found = True
+
+# Check if oldv <= v between each step
+def check_info(v, oldv):
+    a_prime = []
+    fail = False
+    for i, val in enumerate(v):
+        if oldv[i] == 'u':
+            if v[i] == 't' or v[i] == 'f':
+                a_prime.append(arguments[i])
+        else:
+            if v[i] != oldv[i]:
+                fail = True
+    if fail:
+        print("contradiction!")
+    elif len(a_prime) == 0:
+        finish()
+    return a_prime
+
+
+# Returns an interpretation with only arg -> value, and all other args -> u
+def make_one(value, arg):
+    u = size * 'u'
+    arg_in = dex(arg)
+    new = u[:arg_in] + value + u[arg_in:-1]
+
     return new
 
-## Gamma with args as objects with ac, set_args as symbols
-## For whole set of arguments! So not necessarily >=i
-def gamma(v, args):
+
+# Takes expression and interpretation, and returns evaluated expression under interpretation
+def phi(exp, v):
+    if exp == True or exp == False:
+        return exp
+    else:
+        new = exp
+        for i, val in enumerate(v):
+            if val == 't':
+                new = new.subs({arguments[i].sym: True})
+            elif val == 'f':
+                new = new.subs({arguments[i].sym: False})
+
+        # print(new)
+        # print(simplify_logic(new))
+        return new
+
+
+# Gamma with args as objects with ac, set_args as symbols
+# For whole set of arguments! So not necessarily >=i
+def gamma(v):
     new = ''
     # print(v)
-    for a in args:
-        update = phi(a.ac, v, args)
+    for a in arguments:
+        update = phi(a.ac, v)
         # print(update)
         if update == True:
             new = new + 't'
@@ -32,27 +70,28 @@ def gamma(v, args):
     # print(new)
     return new
 
-## v(a): returns truth value of argument arg in interpretation v
-def find_in(v,arg,arguments):
-    return v[dexin(v, arg, arguments)]
 
-# index() but for arguments in v
-def dexin(v,arg,arguments):
-    index = 0
-    for i, val in enumerate(v):
-        if arguments[i].name == arg.name:
-            index = i
+# v(a): returns truth value of argument arg in interpretation v
+def find_in(v, arg):
+    return v[dex(arg.name)]
 
-    return index
+
+# Finds the index of an argument by name
+def dex(arg_name):
+    for a in arguments:
+        if a.name == arg_name:
+            return a.dex
+
 
 def print_full_args(set):
     for a in set:
-        print(a.name)
-        print(a.ac)
+        print(a.name, ":", a.ac)
+
 
 def print_args(set):
     for a in set:
         print(a.name)
+
 
 def print_acs(set):
     for a in set:

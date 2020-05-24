@@ -5,30 +5,56 @@ import os, re
 import json
 import sympy
 from sympy import *
-from sympy.logic import Not, And, Or
+from sympy import simplify
+from sympy.logic import Not, And, Or, Implies, Equivalent
 # import re
 import myfun
 from myfun import *
-import steps
-from steps import *
-
-# arguments = []
+import forward
+from forward import *
 
 class Argument:
     name = ""
     ac = ""
     sym = 0
+    dex = 0
 
 def rewrite(ac):
     # ac = 'neg(and(or(a,b),c))'
-    neg = ac.replace('neg', 'Not')
-    also = neg.replace('and', 'And')
-    last = also.replace('or', 'Or')
-    # print(last)
+    iff = ac.replace('iff', 'Equivalent').replace('imp', 'Implies').replace('neg', 'Not')
+    tf = iff.replace('and', 'And').replace('or', 'Or').replace('c(v)', 'True').replace('c(f)', 'False')
+    # print(tf)
 
-    ## There must be a better way to do this, but for now this works.
-    ## Alternatively, And(True,last) or Or(False,last)
-    return Not(Not(last))
+    ## There might be a better way to do this, but for now this works.
+    return Not(Not(tf))
+
+def get_claim():
+    # initial_claim = input("Please enter initial claim: ")
+    # while True:
+    #     if re.match("^[f,t,u]*$", initial_claim) and len(initial_claim) == myfun.size:
+    #         break
+    #     else:
+    #         print("Error! Input should be {size} characters from t,f, or u. No spaces".format(size=myfun.size))
+    #         initial_claim = input("Please enter initial claim: ")
+
+    init_arg = input("Please enter argument for initial claim: ")
+    claim = input("Please enter the truth value of argument {} in initial claim: ".format(init_arg))
+    while True:
+        if myfun.dex(init_arg) != None and re.match("^[f,t]*$", claim):
+            break
+        elif re.match("^[f,t]*$", claim):
+            print("Error! Argument does not exist")
+            init_arg = input("Please enter argument for initial claim: ")
+        else:
+            print("Error! A truth value is t or f. ")
+            claim = input("Please enter the truth value of argument {} in initial claim: ".format(init_arg))
+
+    initial_claim = myfun.make_one(claim, init_arg)
+
+    print("initial claim: ")
+    print(initial_claim)
+
+    return initial_claim
 
 
 def main(argv):
@@ -40,7 +66,7 @@ def main(argv):
     part = os.path.split(cur_path)[0]
     # print(sys.argv[1])
 
-    ## user_in = input("please enter file name: ")
+    # user_in = input("please enter file name: ")
     user_in = 'adfex2'
     path = part + '/ex/' + user_in
     # print(path)
@@ -56,63 +82,53 @@ def main(argv):
                 a.name = line[2]
                 arg = sympy.symbols('{}'.format(line[2]))
                 a.sym = arg
-                arguments.append(a)
+                a.dex = myfun.size
+
                 myfun.size += 1
+                arguments.append(a)
+                myfun.arguments.append(a)
             elif line[0:2] == 'ac':
-                for a in arguments:
+                for a in myfun.arguments:
                     if a.name == line[3]:
                         # print(line[5:(len(line)-3)])
                         a.ac = rewrite(line[5:(len(line) - 3)])
             else:
                 print("what?")
 
-        print('arguments:')
-        myfun.print_full_args(arguments)
+        print('arguments in ADF:')
+        myfun.print_full_args(myfun.arguments)
 
-    initial_claim = input("Please enter initial claim: ")
-    while True:
-        if re.match("^[f,t,u]*$", initial_claim) and len(initial_claim) == myfun.size:
-            break
-        else:
-            print("Error! Input should be {size} characters from t,f, or u. No spaces".format(size=myfun.size))
-            initial_claim = input("Please enter initial claim: ")
+    print("-------------------")
+    initial_claim = get_claim()
 
-    # print(myfun.eval_exp(arguments[0].ac,initial_claim,set_args))
-    # f.gamma(initial_claim, arguments)
-
-    print(gamma(initial_claim, arguments))
-
-    a_prime = steps.check_info(initial_claim,'uuu',arguments)
+    a_prime = myfun.check_info(initial_claim, 'uuu')
     print("recently presented:")
     myfun.print_args(a_prime)
-    print('---')
+    print("-------------------")
 
-    first = steps.forward(initial_claim, a_prime, arguments)
-    a_prime = steps.check_info(first, initial_claim, arguments)
-    second = steps.forward(first, a_prime, arguments)
-    a_prime = steps.check_info(second, first, arguments)
+    first = forward.forward_step(initial_claim, a_prime)
+    # a_prime = myfun.check_info(first, initial_claim)
+    # second = forward.forward_step(first, a_prime, arguments)
+    # a_prime = myfun.check_info(second, first, arguments)
 
     print("-------------------")
 
-    # print(myfun.gamma('ttf', arguments))
+    # x, y = sympy.symbols('x,y')
+    # test = rewrite('iff(neg(x),or(neg(x),and(y,c(f))))')
+    # print(test.subs({x: True}))
+    # print(simplify(arguments[0].ac))
 
-    # print(myfun.find_in(myfun.gamma(initial_claim, arguments), arguments[0], arguments))
-    # print(steps.find_msat(arguments[0]))
-    # g = steps.just_one_gamma(initial_claim, arguments[0], arguments)
+    # print(forward.find_msat(arguments[0]))
+
+    # g = forward.just_one_gamma(initial_claim, arguments[0], arguments)
     # print("a = just one gamma? ")
     # print(g)
-    #
-    # g = steps.just_one_gamma(initial_claim, arguments[1], arguments)
+
+    # g = forward.just_one_gamma(initial_claim, arguments[1], arguments)
     # print("b = just one gamma? ")
     # print(g)
-    # for c in arguments[0].ac.atoms():
-    #     print(c)
-    #
-    # test1 = 'hello'
-    # test2 = test1[:3] + 'Fu ' + test1[3:]
-    # print(test2)
-    #
-    # steps.gen_msats(arguments[2], initial_claim, arguments)
+
+    # forward.gen_msats(arguments[2], initial_claim, arguments)
 
     print("bye!")
 
