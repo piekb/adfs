@@ -13,11 +13,13 @@ from myfun import *
 import forward
 from forward import *
 
+
 class Argument:
     name = ""
     ac = ""
     sym = 0
     dex = 0
+
 
 def rewrite(ac):
     # ac = 'neg(and(or(a,b),c))'
@@ -27,6 +29,7 @@ def rewrite(ac):
 
     ## There might be a better way to do this, but for now this works.
     return simplify(tf)
+
 
 def get_claim():
     # initial_claim = input("Please enter initial claim: ")
@@ -67,11 +70,9 @@ def main(argv):
     # print(sys.argv[1])
 
     # user_in = input("please enter file name: ")
-    user_in = 'adfex3'
+    user_in = 'adfex2'
     path = part + '/ex/' + user_in
     # print(path)
-
-    arguments = []
 
     with open(path, 'r') as c:
         contents = c.readlines()
@@ -80,12 +81,10 @@ def main(argv):
             if line[0] == 's':
                 a = Argument()
                 a.name = line[2]
-                arg = sympy.symbols('{}'.format(line[2]))
-                a.sym = arg
+                a.sym = sympy.symbols('{}'.format(a.name))
                 a.dex = myfun.size
 
                 myfun.size += 1
-                arguments.append(a)
                 myfun.arguments.append(a)
             elif line[0:2] == 'ac':
                 for a in myfun.arguments:
@@ -101,15 +100,33 @@ def main(argv):
     print("-------------------")
     initial_claim = get_claim()
 
-    a_prime = myfun.check_info(initial_claim, 'uuu')
+    a_prime = myfun.check_info(initial_claim, myfun.make_one('u', 'a'))[0]
     print("recently presented:")
     myfun.print_args(a_prime)
     print("-------------------")
 
-    first = forward.forward_step(initial_claim, a_prime)
+    first = initial_claim
+    second = forward.forward_step(initial_claim, a_prime)
+    while True:
+        a_prime, contra, found = myfun.check_info(second, first)
+        if contra:
+            # found contradiction, need to apply backward move
+            print("found a contradiction, need to apply backward move")
+            break
+        elif found:
+            # found agreement
+            print("agreement found!")
+            break
+        else:
+            print("no contradiction, no agreement found")
+            first = second
+            second = forward.forward_step(first, a_prime)
+
+
+    # first = forward.forward_step(initial_claim, a_prime)
     # a_prime = myfun.check_info(first, initial_claim)
-    # second = forward.forward_step(first, a_prime, arguments)
-    # a_prime = myfun.check_info(second, first, arguments)
+    # second = forward.forward_step(first, a_prime)
+    # a_prime = myfun.check_info(second, first)
 
     print("-------------------")
 

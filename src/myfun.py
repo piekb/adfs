@@ -4,27 +4,24 @@ from sympy import simplify
 arguments = []
 size = 0
 
-
-def finish():
-    print("agreement found!")
-    found = True
-
 # Check if oldv <= v between each step
 def check_info(v, oldv):
     a_prime = []
-    fail = False
+    contra = False
+    found = False
     for i, val in enumerate(v):
         if oldv[i] == 'u':
             if v[i] == 't' or v[i] == 'f':
+                print(f'adding {arguments[i].name} to aprime')
                 a_prime.append(arguments[i])
         else:
             if v[i] != oldv[i]:
-                fail = True
-    if fail:
-        print("contradiction!")
-    elif len(a_prime) == 0:
-        finish()
-    return a_prime
+                print("contradiction found!")
+                contra = True
+    if len(a_prime) == 0:
+        # Actually, not found if contradiction. But adding not contra gives
+        found = True
+    return a_prime, contra, found
 
 
 # Returns an interpretation with only arg -> value, and all other args -> u
@@ -49,7 +46,7 @@ def phi(exp, v):
                 new = new.subs({arguments[i].sym: False})
 
         # print(new)
-        # print(simplify_logic(new))
+        # print(f'this is {simplify(new)}')
         return simplify(new)
 
 

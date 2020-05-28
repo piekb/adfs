@@ -123,16 +123,16 @@ def delta(v, a_prime, a):
     truth_val = myfun.find_in(v, a)
     if truth_val == 't' or truth_val == 'f':
         if not (a in a_prime):
-            # print("first case in delta")
-            myfun.print_args(a_prime)
+            print("first condition delta")
             update = truth_val
-        elif myfun.phi(a.ac, v) == True or myfun.phi(a.ac, v) == False:
+        elif (myfun.phi(a.ac, v) == True and truth_val == 't') or (myfun.phi(a.ac, v) == False and truth_val == 'f'):
             print("second condition delta")
             update = truth_val
         elif third(v, a_prime, a):
             print("third condition delta")
             update = truth_val
         else:
+            print("fifth condition delta")
             update = 'u'
     elif truth_val == 'u':
         four = fourth(v, a_prime, a)
@@ -141,6 +141,7 @@ def delta(v, a_prime, a):
             msat = four[1]
             update = myfun.find_in(msat, a)
         else:
+            print("fifth condition delta")
             update = 'u'
 
     return update
@@ -156,7 +157,7 @@ def forward_step(v, a_prime):
 
     out = ''
     for a in myfun.arguments:
-        print(f"for argument {a.name}")
+        # print(f"for argument {a.name}")
         out = out + delta(v, a_prime, a)
 
     print("final delta:")
