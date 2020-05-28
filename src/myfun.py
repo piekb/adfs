@@ -4,6 +4,7 @@ from sympy import simplify
 arguments = []
 size = 0
 
+
 # Check if oldv <= v between each step
 def check_info(v, oldv):
     a_prime = []
@@ -12,14 +13,12 @@ def check_info(v, oldv):
     for i, val in enumerate(v):
         if oldv[i] == 'u':
             if v[i] == 't' or v[i] == 'f':
-                print(f'adding {arguments[i].name} to aprime')
                 a_prime.append(arguments[i])
         else:
             if v[i] != oldv[i]:
-                print("contradiction found!")
                 contra = True
     if len(a_prime) == 0:
-        # Actually, not found if contradiction. But adding not contra gives
+        # Actually, not found if contradiction. Easier to write it this way though.
         found = True
     return a_prime, contra, found
 

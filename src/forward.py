@@ -12,7 +12,7 @@ from ext import *
 known_msats = {}
 
 
-## Returns the set of mSAT interpretations from a list of SAT interpretations.
+# Returns the set of mSAT interpretations from a list of SAT interpretations.
 def min_info(sats):
     msats = []
     d = dict.fromkeys(sats, 1)
@@ -32,7 +32,7 @@ def min_info(sats):
     return msats
 
 
-## Generates set of minimal satisfiable interpretations for argument a under interpretation v.
+# Generates set of minimal satisfiable interpretations for argument a under interpretation v.
 def gen_msats(v, a):
     inters = ext.gen_inters(myfun.size)
     sats = []
@@ -59,7 +59,7 @@ def find_msat(v, a):
     else:
         msats = gen_msats(v, a)
         if phi_a == True or phi_a == False or len(msats) == 0:
-            print("here now")
+            # Second condition of mSAT_F
             msat = just_one_gamma(v, a)
         else:
             msat = msats[0]
@@ -69,7 +69,7 @@ def find_msat(v, a):
     return msat
 
 
-## Returns if there is any conflict in the "rest" of a-prime without the first defined value.
+# Returns if there is any conflict in the "rest" of a-prime without the first defined value.
 def no_conflict(v, a_prime, a_i):
     val_ai = myfun.find_in(v, a_i)
     for a_j in a_prime:
@@ -84,10 +84,9 @@ def no_conflict(v, a_prime, a_i):
 # Returns {a to Gamma(v)(a)}
 def just_one_gamma(v, a):
     new = myfun.find_in(myfun.gamma(v), a)
-
     gam = myfun.make_one(new, a.name)
     if gam.count('u') == myfun.size:
-        print("gamma is also undecided")
+        print("Gamma is also undecided")
 
     return gam
 
@@ -157,7 +156,7 @@ def forward_step(v, a_prime):
 
     out = ''
     for a in myfun.arguments:
-        # print(f"for argument {a.name}")
+        print(f"Delta of argument {a.name}")
         out = out + delta(v, a_prime, a)
 
     print("final delta:")
