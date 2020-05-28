@@ -26,7 +26,7 @@ def rewrite(ac):
     # print(tf)
 
     ## There might be a better way to do this, but for now this works.
-    return Not(Not(tf))
+    return simplify(tf)
 
 def get_claim():
     # initial_claim = input("Please enter initial claim: ")
@@ -67,7 +67,7 @@ def main(argv):
     # print(sys.argv[1])
 
     # user_in = input("please enter file name: ")
-    user_in = 'adfex2'
+    user_in = 'adfex3'
     path = part + '/ex/' + user_in
     # print(path)
 

@@ -50,7 +50,7 @@ def phi(exp, v):
 
         # print(new)
         # print(simplify_logic(new))
-        return new
+        return simplify(new)
 
 
 # Gamma with args as objects with ac, set_args as symbols
