@@ -10,6 +10,8 @@ import ext
 from ext import *
 
 known_msats = {}
+prime_known_msats = {}
+i = 1
 
 
 # Returns the set of mSAT interpretations from a list of SAT interpretations.
@@ -34,19 +36,24 @@ def min_info(sats):
 
 # Generates set of minimal satisfiable interpretations for argument a under interpretation v.
 def gen_msats(v, a):
-    inters = ext.gen_inters(myfun.size)
     sats = []
-    arg_in = myfun.dex(a.name)
+    phi_a = myfun.phi(a.ac, v)
+    if phi_a == True or phi_a == False:
+        # Second condition of mSAT_F
+        sats.append(just_one_gamma(v, a))
+    else:
+        inters = ext.gen_inters(myfun.size)
+        arg_in = myfun.dex(a.name)
 
-    for i, inter in enumerate(inters):
-        sat = inter[:arg_in] + 'u' + inter[arg_in:]
-        v_a = myfun.find_in(v, a)
-        gam_a = myfun.find_in(myfun.gamma(sat), a)
-        # print(f"for arg {a.name} v({a.name}) = {v_a}")
-        # print(f"for arg {a.name} gamma({a.name}) = {gam_a}")
+        for j, inter in enumerate(inters):
+            sat = inter[:arg_in] + 'u' + inter[arg_in:]
+            v_a = myfun.find_in(v, a)
+            gam_a = myfun.find_in(myfun.gamma(sat), a)
+            # print(f"for arg {a.name} v({a.name}) = {v_a}")
+            # print(f"for arg {a.name} gamma({a.name}) = {gam_a}")
 
-        if v_a == gam_a:
-            sats.append(sat)
+            if v_a == gam_a:
+                sats.append(sat)
 
     msats = min_info(sats)
     return msats
@@ -54,15 +61,23 @@ def gen_msats(v, a):
 
 def find_msat(v, a):
     phi_a = myfun.phi(a.ac, v)
+    if f'{a}' in prime_known_msats.keys():
+        print(f"FOUND ONE: {prime_known_msats[f'{a}']}")
     if f'{a}' in known_msats.keys():
+        # print("NOT IN PRIME MAAR WEL IN KNOWN")
         msat = known_msats[f'{a}']
     else:
+        # print("HELLO IM HERE NOW")
         msats = gen_msats(v, a)
         if phi_a == True or phi_a == False or len(msats) == 0:
             # Second condition of mSAT_F
             msat = just_one_gamma(v, a)
         else:
-            msat = msats[0]
+            if len(msats) > i:
+                msat = msats[i]
+            else:
+                print("wuh oh")
+                msat = msats[0]
         known_msats[f'{a}'] = msat
 
     # print(f'msat for arg {a.name} = {msat}')
@@ -94,6 +109,7 @@ def just_one_gamma(v, a):
 def third(v, a_prime, a):
     phi_a = myfun.phi(a.ac, v)
     msat_arg = find_msat(v, a)
+    print(f"Finding msat for argument {a.name}, is it in aprime? {a in a_prime}")
     if msat_arg == just_one_gamma(v, a):
         return False
     else:
@@ -102,6 +118,8 @@ def third(v, a_prime, a):
             if not no_conflict(v, a_prime, c):
                 print("- conflict found -")
                 return False
+            # else:
+            #     print(f'no conflict for {c.name}')
     return True
 
 
@@ -149,10 +167,19 @@ def delta(v, a_prime, a):
 # Forward move
 # Q: should updated ac's be passed or just per function?
 def forward_step(v, a_prime):
+    # IF GETTING MSATS FIRST: CHANGE SUCH THAT MSAT(TRUE/FALSE) != ALL U'S!
     updated_acs = []
+    mins = []
+    num = 0
     for a in a_prime:
         updated_acs.append(myfun.phi(a.ac, v))
+        # mins.append(gen_msats(v, a))
+        msats = gen_msats(v, a)
+        # num += len(msats)
+        # prime_known_msats[f'{a}'] = msats
+        print(msats)
     # myfun.print_acs(updated_acs)
+    # print(len(a_prime), len(prime_known_msats), num)
 
     out = ''
     for a in myfun.arguments:
@@ -161,4 +188,12 @@ def forward_step(v, a_prime):
 
     print("final delta:")
     print(out)
+    # deltas.append(out)
+
+    # deltas = []
+    # if num > len(a_prime):
+    #     for m in mins:
+    #
+
+    # return deltas
     return out

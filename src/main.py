@@ -7,10 +7,12 @@ import json
 import sympy
 import myfun
 import forward
+import tree
 
 from sympy import *
 from myfun import *
 from forward import *
+from tree import *
 
 
 class Argument:
@@ -60,7 +62,7 @@ def main(argv):
     part = os.path.split(cur_path)[0]
 
     # user_in = input("please enter file name: ")
-    user_in = 'adfex2'
+    user_in = 'adfex6'
     path = part + '/ex/' + user_in
     # print(path)
 
@@ -91,19 +93,46 @@ def main(argv):
     print("-------------------")
 
     first = initial_claim
-    second = forward.forward_step(initial_claim, a_prime)
+    second = forward.forward_step(initial_claim, a_prime)#[0]
+    n = tree.Root(first)
+    n.add_child(second)
+    # for i, c in enumerate(second):
+    #     n.add_child(c)
+
+
     while True:
         a_prime, contra, found = myfun.check_info(second, first)
         if contra:
             print("Found a contradiction, will apply backward move")
+            n.visited = True
+            if type(n) is tree.Root:
+                print("P loses game")
+                break
+            else:
+                for c in n.children:
+                    print(c.data)
+                # n = n.parent
+                # print("hello the parent is here")
+                # forward.i += 1
+                # second = forward.forward_step(first, a_prime)
             break
         elif found:
             print("Agreement found!")
             break
         else:
+            n = n.children[0]
             print("No contradiction, no agreement found")
             first = second
             second = forward.forward_step(first, a_prime)
+            n.add_child(second)
+            n.add_child('other')
+            # for i, c in enumerate(second):
+            #     n.add_child(c)
+
+    print("Let's look at the tree so far")
+    while type(n) is not tree.Root:
+        n = n.parent
+    tree.traverse(n, 0)
 
     print("-------------------")
     print("Bye!")
