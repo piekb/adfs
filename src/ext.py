@@ -1,3 +1,5 @@
+import copy
+from copy import deepcopy
 inters = []
 
 
@@ -59,12 +61,58 @@ def walk_tree_df_postorder(node, visit):
     visit(node)
 
 
-if __name__ == '__main__':
+m_a = ['1.1 tfu']
+m_b = ['2.1 tuf', '2.2 ttt', '2.3 fff']
+m_c = ['3.1 ftt', '3.2 tfu']
+set_m = [m_a, m_b, m_c]
+
+m_all = [['tfu', 'tuf', 'ftt'],
+         ['tfu', 'ttt', 'ftt'],
+         ['tfu', 'fff', 'ftt'],
+         ['tfu', 'tuf', 'tfu'],
+         ['tfu', 'ttt', 'tfu'],
+         ['tfu', 'fff', 'tfu']]
+full = []
+
+
+def combine_rec(i, x):
+    if i == len(set_m):
+        y = deepcopy(x)
+        full.append(y)
+    else:
+        for m in set_m[i]:
+            x.append(m)
+            combine_rec(i + 1, x)
+            x.pop()
+
+
+def combine():
+    x = []
+    for e in m_a:
+        print(f"{e} in m_a")
+        x.append(e)
+        for f in m_b:
+            print(f"{f} in m_b")
+            x.append(f)
+            for g in m_c:
+                print(f"{g} in m_c")
+                x.append(g)
+                # print(x)
+                y = deepcopy(x)
+                full.append(y)
+                x.pop()
+            x.pop()
+        x.pop()
+
+
+    # print(full)
+
+
+def test_tree():
     T = Tree
 
     def visit(n):
         print(n)
-
 
     #    *
     #   / \
@@ -74,9 +122,16 @@ if __name__ == '__main__':
     #       / \
     #      3   4
     t = T('1 if', [T('1.1 cond', [T('1.1.1 equal', [T('1.1.1.1 x'), T('1.1.1.2 y')])]),
-                 T('1.2 true', [T('1.2.1 print', [T('1.2.1.1 OK')])]),
-                 T('1.3 false', [T('1.3.1 end')])])
+                   T('1.2 true', [T('1.2.1 print', [T('1.2.1.1 OK')])]),
+                   T('1.3 false', [T('1.3.1 end')])])
     print('=>Tree, Depth-First, Pre-Order')
     walk_tree_df_preorder(t, visit)
     print('=>Tree, Depth-First, Post-Order')
     walk_tree_df_postorder(t, visit)
+
+
+if __name__ == '__main__':
+    combine_rec(0, [])
+    # print(full)
+    for n in full:
+        print(n)

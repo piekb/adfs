@@ -32,6 +32,15 @@ def make_one(value, arg):
     return new
 
 
+def combine_msats(msats):
+    comb = []
+    for m in comb:
+        m = []
+
+
+    return comb
+
+
 # Takes expression and interpretation, and returns evaluated expression under interpretation
 def phi(exp, v):
     if exp == True or exp == False:

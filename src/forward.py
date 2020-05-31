@@ -11,7 +11,8 @@ from ext import *
 
 known_msats = {}
 prime_known_msats = {}
-i = 1
+i = 0
+min_prime = []
 
 
 # Returns the set of mSAT interpretations from a list of SAT interpretations.
@@ -64,23 +65,24 @@ def find_msat(v, a):
     if f'{a}' in prime_known_msats.keys():
         print(f"FOUND ONE: {prime_known_msats[f'{a}']}")
     if f'{a}' in known_msats.keys():
-        # print("NOT IN PRIME MAAR WEL IN KNOWN")
+        print("ALSO IN KNOWN")
         msat = known_msats[f'{a}']
     else:
-        # print("HELLO IM HERE NOW")
+        print("HELLO IM HERE NOW")
         msats = gen_msats(v, a)
         if phi_a == True or phi_a == False or len(msats) == 0:
             # Second condition of mSAT_F
             msat = just_one_gamma(v, a)
         else:
             if len(msats) > i:
+                print(f"hey, i = {i}")
                 msat = msats[i]
             else:
                 print("wuh oh")
                 msat = msats[0]
         known_msats[f'{a}'] = msat
 
-    # print(f'msat for arg {a.name} = {msat}')
+    print(f'msat for arg {a.name} = {msat}, i={i}')
     return msat
 
 
@@ -170,13 +172,11 @@ def forward_step(v, a_prime):
     # IF GETTING MSATS FIRST: CHANGE SUCH THAT MSAT(TRUE/FALSE) != ALL U'S!
     updated_acs = []
     mins = []
-    num = 0
     for a in a_prime:
         updated_acs.append(myfun.phi(a.ac, v))
-        # mins.append(gen_msats(v, a))
+        mins.append(gen_msats(v, a))
         msats = gen_msats(v, a)
-        # num += len(msats)
-        # prime_known_msats[f'{a}'] = msats
+        prime_known_msats[f'{a}'] = msats
         print(msats)
     # myfun.print_acs(updated_acs)
     # print(len(a_prime), len(prime_known_msats), num)

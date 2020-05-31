@@ -70,3 +70,32 @@
 #                         arg=a.name, ac=a.ac))
 #
 #     return msat
+m_a = ['tfu']
+m_b = ['tuf', 'ttt', 'fff']
+m_c = ['ftt', 'tfu']
+
+m_all = [['tfu', 'tuf', 'ftt'],
+         ['tfu', 'ttt', 'ftt'],
+         ['tfu', 'fff', 'ftt'],
+         ['tfu', 'tuf', 'tfu'],
+         ['tfu', 'ttt', 'tfu'],
+         ['tfu', 'fff', 'tfu']]
+full = []
+
+
+def combine():
+    full.append()
+
+
+def combine():
+    for e in m_a:
+        for f in m_b:
+            for g in m_c:
+                full.append([e, f, g])
+
+    print(full)
+
+
+
+
+

@@ -120,14 +120,18 @@ def main(argv):
             print("Agreement found!")
             break
         else:
-            n = n.children[0]
             print("No contradiction, no agreement found")
+            n = n.children[0]
             first = second
+            forward.i = 1
             second = forward.forward_step(first, a_prime)
+            forward.i = 0
+            third = forward.forward_step(first, a_prime)
             n.add_child(second)
-            n.add_child('other')
+            n.add_child(third)
             # for i, c in enumerate(second):
             #     n.add_child(c)
+
 
     print("Let's look at the tree so far")
     while type(n) is not tree.Root:
