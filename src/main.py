@@ -30,15 +30,18 @@ def rewrite(ac):
     return simplify(tf)
 
 
-def get_claim():
-    # initial_claim = input("Please enter initial claim: ")
-    # while True:
-    #     if re.match("^[f,t,u]*$", initial_claim) and len(initial_claim) == myfun.size:
-    #         break
-    #     else:
-    #         print("Error! Input should be {size} characters from t,f, or u. No spaces".format(size=myfun.size))
-    #         initial_claim = input("Please enter initial claim: ")
+def input_claim():
+    initial_claim = input("Please enter initial claim: ")
+    while True:
+        if re.match("^[f,t,u]*$", initial_claim) and len(initial_claim) == myfun.size:
+            break
+        else:
+            print("Error! Input should be {size} characters from t,f, or u. No spaces".format(size=myfun.size))
+            initial_claim = input("Please enter initial claim: ")
+    print(f"Initial claim: {initial_claim}")
+    return initial_claim
 
+def get_claim():
     init_arg = input("Please enter argument for initial claim: ")
     claim = input(f"Please enter the truth value of argument {init_arg} in initial claim: ")
     while True:
@@ -55,6 +58,7 @@ def get_claim():
     print(f"Initial claim: {initial_claim}")
     return initial_claim
 
+
 def main(argv):
     print("Hello!")
 
@@ -62,7 +66,7 @@ def main(argv):
     part = os.path.split(cur_path)[0]
 
     # user_in = input("please enter file name: ")
-    user_in = 'adfex6'
+    user_in = 'adfex7'
     path = part + '/ex/' + user_in
     # print(path)
 
@@ -93,44 +97,49 @@ def main(argv):
     print("-------------------")
 
     first = initial_claim
-    second = forward.forward_step(initial_claim, a_prime)#[0]
     n = tree.Root(first)
-    n.add_child(second)
-    # for i, c in enumerate(second):
-    #     n.add_child(c)
-
-
+    updates = forward.forward_step(initial_claim, a_prime)
+    for c in updates:
+        print(f"New node {c}")
+        n.add_child(c)
+    second = updates[0]
+    n = n.children[0]
+    j = 0
     while True:
+        print(f"Current node is {n.data}")
         a_prime, contra, found = myfun.check_info(second, first)
         if contra:
             print("Found a contradiction, will apply backward move")
-            n.visited = True
-            if type(n) is tree.Root:
+            n = n.parent
+            if len(n.children) > j + 1:
+                n = n.children[j + 1]
+                second = n.data
+            elif type(n) is tree.Root:
                 print("P loses game")
                 break
             else:
-                for c in n.children:
-                    print(c.data)
-                # n = n.parent
-                # print("hello the parent is here")
-                # forward.i += 1
-                # second = forward.forward_step(first, a_prime)
-            break
+                n = n.parent
+                first = n.data
+                print(len(n.children), j + 1)
+                if len(n.children) > j + 1:
+                    n = n.children[j + 1]
+                    second = n.data
+                else:
+                    print("should go further up")
+                    # n = n.parent
+                    break
         elif found:
             print("Agreement found!")
             break
         else:
             print("No contradiction, no agreement found")
-            n = n.children[0]
             first = second
-            forward.i = 1
-            second = forward.forward_step(first, a_prime)
-            forward.i = 0
-            third = forward.forward_step(first, a_prime)
-            n.add_child(second)
-            n.add_child(third)
-            # for i, c in enumerate(second):
-            #     n.add_child(c)
+            updates = forward.forward_step(first, a_prime)
+            for c in updates:
+                print(f"New node {c}")
+                n.add_child(c)
+            second = updates[0]
+            n = n.children[0]
 
 
     print("Let's look at the tree so far")

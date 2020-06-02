@@ -32,17 +32,9 @@ def make_one(value, arg):
     return new
 
 
-def combine_msats(msats):
-    comb = []
-    for m in comb:
-        m = []
-
-
-    return comb
-
-
 # Takes expression and interpretation, and returns evaluated expression under interpretation
 def phi(exp, v):
+    # print(f"expression = {exp} right here")
     if exp == True or exp == False:
         return exp
     else:
@@ -53,6 +45,7 @@ def phi(exp, v):
             elif val == 'f':
                 new = new.subs({arguments[i].sym: False})
 
+        # print(f"found {new} for expression {exp}")
         # print(new)
         # print(f'this is {simplify(new)}')
         return simplify(new)

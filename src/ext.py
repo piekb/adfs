@@ -1,5 +1,6 @@
 import copy
 from copy import deepcopy
+
 inters = []
 
 
@@ -60,11 +61,30 @@ def walk_tree_df_postorder(node, visit):
         walk_tree_df_preorder(child, visit)
     visit(node)
 
+def test_tree():
+    T = Tree
 
-m_a = ['1.1 tfu']
-m_b = ['2.1 tuf', '2.2 ttt', '2.3 fff']
-m_c = ['3.1 ftt', '3.2 tfu']
-set_m = [m_a, m_b, m_c]
+    def visit(n):
+        print(n)
+
+    #    *
+    #   / \
+    #  1   +
+    #     / \
+    #    2   -
+    #       / \
+    #      3   4
+    t = T('1 if', [T('1.1 cond', [T('1.1.1 equal', [T('1.1.1.1 x'), T('1.1.1.2 y')])]),
+                   T('1.2 true', [T('1.2.1 print', [T('1.2.1.1 OK')])]),
+                   T('1.3 false', [T('1.3.1 end')])])
+    print('=>Tree, Depth-First, Pre-Order')
+    walk_tree_df_preorder(t, visit)
+    print('=>Tree, Depth-First, Post-Order')
+    walk_tree_df_postorder(t, visit)
+
+
+m = {'a': ['1.1 tfu'], 'b': ['2.1 tuf', '2.2 ttt', '2.3 fff'], 'c': ['3.1 ftt', '3.2 tfu']}
+set_m = list(m.values())
 
 m_all = [['tfu', 'tuf', 'ftt'],
          ['tfu', 'ttt', 'ftt'],
@@ -88,13 +108,13 @@ def combine_rec(i, x):
 
 def combine():
     x = []
-    for e in m_a:
+    for e in m['a']:
         print(f"{e} in m_a")
         x.append(e)
-        for f in m_b:
+        for f in m['b']:
             print(f"{f} in m_b")
             x.append(f)
-            for g in m_c:
+            for g in m['c']:
                 print(f"{g} in m_c")
                 x.append(g)
                 # print(x)
@@ -104,34 +124,32 @@ def combine():
             x.pop()
         x.pop()
 
-
     # print(full)
 
 
-def test_tree():
-    T = Tree
-
-    def visit(n):
-        print(n)
-
-    #    *
-    #   / \
-    #  1   +
-    #     / \
-    #    2   -
-    #       / \
-    #      3   4
-    t = T('1 if', [T('1.1 cond', [T('1.1.1 equal', [T('1.1.1.1 x'), T('1.1.1.2 y')])]),
-                   T('1.2 true', [T('1.2.1 print', [T('1.2.1.1 OK')])]),
-                   T('1.3 false', [T('1.3.1 end')])])
-    print('=>Tree, Depth-First, Pre-Order')
-    walk_tree_df_preorder(t, visit)
-    print('=>Tree, Depth-First, Post-Order')
-    walk_tree_df_postorder(t, visit)
-
-
-if __name__ == '__main__':
+def combine_msats(msats):
+    # print("combining")
+    # print(list(msats.keys()))
+    # print(list(msats.values()))
+    global set_m, full
+    full = []
+    set_m = list(msats.values())
     combine_rec(0, [])
-    # print(full)
-    for n in full:
-        print(n)
+
+    new_m = {}
+    i = 0
+    for k in list(msats.keys()):
+        x = []
+        for n in full:
+            x.append(n[i])
+            # print(n)
+        new_m[k] = x
+        i += 1
+
+    return new_m
+
+
+# if __name__ == '__main__':
+#     y = combine_msats(m)
+#     print(y)
+#     print(y['b'][4])

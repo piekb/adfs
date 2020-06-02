@@ -13,11 +13,12 @@ known_msats = {}
 prime_known_msats = {}
 i = 0
 min_prime = []
+msats = {}
 
 
 # Returns the set of mSAT interpretations from a list of SAT interpretations.
 def min_info(sats):
-    msats = []
+    min_sats = []
     d = dict.fromkeys(sats, 1)
     for i, sat in enumerate(sats):
         count = 0
@@ -30,9 +31,9 @@ def min_info(sats):
     for w in sort:
         # print(w, d[w])
         if d[w] == d[sort[0]]:
-            msats.append(w)
+            min_sats.append(w)
 
-    return msats
+    return min_sats
 
 
 # Generates set of minimal satisfiable interpretations for argument a under interpretation v.
@@ -56,33 +57,38 @@ def gen_msats(v, a):
             if v_a == gam_a:
                 sats.append(sat)
 
-    msats = min_info(sats)
-    return msats
+    min_sats = min_info(sats)
+    return min_sats
 
 
 def find_msat(v, a):
-    phi_a = myfun.phi(a.ac, v)
-    if f'{a}' in prime_known_msats.keys():
-        print(f"FOUND ONE: {prime_known_msats[f'{a}']}")
-    if f'{a}' in known_msats.keys():
-        print("ALSO IN KNOWN")
-        msat = known_msats[f'{a}']
-    else:
-        print("HELLO IM HERE NOW")
-        msats = gen_msats(v, a)
-        if phi_a == True or phi_a == False or len(msats) == 0:
-            # Second condition of mSAT_F
-            msat = just_one_gamma(v, a)
-        else:
-            if len(msats) > i:
-                print(f"hey, i = {i}")
-                msat = msats[i]
-            else:
-                print("wuh oh")
-                msat = msats[0]
-        known_msats[f'{a}'] = msat
+    # phi_a = myfun.phi(a.ac, v)
+    if f'{a.name}' in msats.keys():
+        msat = msats[f'{a.name}'][i]
+        if len(msats[f'{a.name}']) <= i:
+            print("Hey, that doesn't exist!")
+            # print(f"heya, msat for {a.name} is {msats[f'{a.name}'][i]}")
+            msat = msats[f'{a.name}'][0]
+        # else:
+        #     print("i = 0 hoor rustig maar tijger")
+        #     print(f"heya, msat for {a.name} is {msats[f'{a.name}'][0]}")
 
-    print(f'msat for arg {a.name} = {msat}, i={i}')
+    # if f'{a}' in known_msats.keys():
+    #     msat = known_msats[f'{a}']
+    # else:
+    #     min_sats = gen_msats(v, a)
+    #     if phi_a == True or phi_a == False or len(min_sats) == 0:
+    # Second condition of mSAT_F
+    # msat = just_one_gamma(v, a)
+    # else:
+    #     if len(min_sats) > i:
+    #         print(f"hey, i = {i}, m = {min_sats[i]}")
+    # msat = min_sats[i]
+    # else:
+    #     print("wuh oh")
+    #     msat = min_sats[0]
+    # known_msats[f'{a}'] = msat
+
     return msat
 
 
@@ -102,16 +108,17 @@ def no_conflict(v, a_prime, a_i):
 def just_one_gamma(v, a):
     new = myfun.find_in(myfun.gamma(v), a)
     gam = myfun.make_one(new, a.name)
-    if gam.count('u') == myfun.size:
-        print("Gamma is also undecided")
+    # if gam.count('u') == myfun.size:
+    #     print("Gamma is also undecided")
 
     return gam
 
 
+# Argument is in a-prime
 def third(v, a_prime, a):
     phi_a = myfun.phi(a.ac, v)
     msat_arg = find_msat(v, a)
-    print(f"Finding msat for argument {a.name}, is it in aprime? {a in a_prime}")
+    # print(f"Finding msat for argument {a.name}, is it in aprime? {a in a_prime}")
     if msat_arg == just_one_gamma(v, a):
         return False
     else:
@@ -120,8 +127,6 @@ def third(v, a_prime, a):
             if not no_conflict(v, a_prime, c):
                 print("- conflict found -")
                 return False
-            # else:
-            #     print(f'no conflict for {c.name}')
     return True
 
 
@@ -142,25 +147,25 @@ def delta(v, a_prime, a):
     truth_val = myfun.find_in(v, a)
     if truth_val == 't' or truth_val == 'f':
         if not (a in a_prime):
-            print("first condition delta")
+            # print("first condition delta")
             update = truth_val
         elif (myfun.phi(a.ac, v) == True and truth_val == 't') or (myfun.phi(a.ac, v) == False and truth_val == 'f'):
-            print("second condition delta")
+            # print("second condition delta")
             update = truth_val
         elif third(v, a_prime, a):
-            print("third condition delta")
+            # print("third condition delta")
             update = truth_val
         else:
-            print("fifth condition delta")
+            # print("fifth condition delta")
             update = 'u'
     elif truth_val == 'u':
         four = fourth(v, a_prime, a)
         if four[0]:
-            print("fourth condition delta")
+            # print("fourth condition delta")
             msat = four[1]
             update = myfun.find_in(msat, a)
         else:
-            print("fifth condition delta")
+            # print("fifth condition delta")
             update = 'u'
 
     return update
@@ -169,31 +174,37 @@ def delta(v, a_prime, a):
 # Forward move
 # Q: should updated ac's be passed or just per function?
 def forward_step(v, a_prime):
-    # IF GETTING MSATS FIRST: CHANGE SUCH THAT MSAT(TRUE/FALSE) != ALL U'S!
-    updated_acs = []
-    mins = []
+    global msats, prime_known_msats, i
+    i = 0
+    # updated_acs = []
+    prime_known_msats = {}
     for a in a_prime:
-        updated_acs.append(myfun.phi(a.ac, v))
-        mins.append(gen_msats(v, a))
-        msats = gen_msats(v, a)
-        prime_known_msats[f'{a}'] = msats
-        print(msats)
-    # myfun.print_acs(updated_acs)
-    # print(len(a_prime), len(prime_known_msats), num)
+        # updated_acs.append(myfun.phi(a.ac, v))
+        prime_known_msats[f'{a.name}'] = gen_msats(v, a)
+    # print("keys:")
+    # print(list(prime_known_msats.keys()))
+    # print("values:")
+    # print(list(prime_known_msats.values()))
+    # print(updated_acs)
 
-    out = ''
-    for a in myfun.arguments:
-        print(f"Delta of argument {a.name}")
-        out = out + delta(v, a_prime, a)
+    msats = ext.combine_msats(prime_known_msats)
+    print(msats)
+    num = len(ext.full)
+    # print("that's all")
 
-    print("final delta:")
+    deltas = []
+    # for _ in a_prime:
+    while i < num:
+        out = ''
+        for a in myfun.arguments:
+            # print(f"Delta of argument {a.name}")
+            out = out + delta(v, a_prime, a)
+        deltas.append(out)
+        i += 1
+
+    print(deltas)
+    print("Final delta:")
+    out = deltas[0]
     print(out)
-    # deltas.append(out)
-
-    # deltas = []
-    # if num > len(a_prime):
-    #     for m in mins:
-    #
-
-    # return deltas
-    return out
+    # return out
+    return deltas

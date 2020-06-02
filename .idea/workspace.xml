@@ -21,7 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="12592f77-e5e4-45c0-8d5c-a9a67c8812b0" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dev.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dev.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ex/adfex7" beforeDir="false" afterPath="$PROJECT_DIR$/ex/adfex7" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ext.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ext.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/forward.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/forward.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
@@ -64,7 +64,7 @@
       <recent name="C:\Users\Gebruiker\PycharmProjects\adfs" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.ext">
+  <component name="RunManager" selected="Python.main (1)">
     <configuration name="ext" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="adfs" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -151,8 +151,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.ext" />
         <item itemvalue="Python.main (1)" />
+        <item itemvalue="Python.ext" />
         <item itemvalue="Python.tree" />
         <item itemvalue="Python.main" />
       </list>
@@ -187,6 +187,10 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="426" y="108" key="#Inspections" timestamp="1591119339018">
+      <screen x="0" y="0" width="1600" height="860" />
+    </state>
+    <state x="426" y="108" key="#Inspections/0.0.1600.860@0.0.1600.860" timestamp="1591119339018" />
     <state x="1051" y="502" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1590938620755">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -199,29 +203,29 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1060" y="455" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1589814147357" />
-    <state width="1579" height="270" key="GridCell.Tab.0.bottom" timestamp="1590952580878">
+    <state width="1579" height="367" key="GridCell.Tab.0.bottom" timestamp="1591132563591">
       <screen x="0" y="0" width="1600" height="860" />
     </state>
     <state width="2539" height="289" key="GridCell.Tab.0.bottom/0.0.1440.860/1440.0.2560.1400@1440.0.2560.1400" timestamp="1590697623449" />
-    <state width="1579" height="270" key="GridCell.Tab.0.bottom/0.0.1600.860@0.0.1600.860" timestamp="1590952580878" />
+    <state width="1579" height="367" key="GridCell.Tab.0.bottom/0.0.1600.860@0.0.1600.860" timestamp="1591132563591" />
     <state width="2539" height="365" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1590950005289" />
-    <state width="1579" height="270" key="GridCell.Tab.0.center" timestamp="1590952580878">
+    <state width="1579" height="367" key="GridCell.Tab.0.center" timestamp="1591132563590">
       <screen x="0" y="0" width="1600" height="860" />
     </state>
     <state width="2539" height="289" key="GridCell.Tab.0.center/0.0.1440.860/1440.0.2560.1400@1440.0.2560.1400" timestamp="1590697623449" />
-    <state width="1579" height="270" key="GridCell.Tab.0.center/0.0.1600.860@0.0.1600.860" timestamp="1590952580878" />
+    <state width="1579" height="367" key="GridCell.Tab.0.center/0.0.1600.860@0.0.1600.860" timestamp="1591132563590" />
     <state width="2539" height="365" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1590950005288" />
-    <state width="1579" height="270" key="GridCell.Tab.0.left" timestamp="1590952580878">
+    <state width="1579" height="367" key="GridCell.Tab.0.left" timestamp="1591132563589">
       <screen x="0" y="0" width="1600" height="860" />
     </state>
     <state width="2539" height="289" key="GridCell.Tab.0.left/0.0.1440.860/1440.0.2560.1400@1440.0.2560.1400" timestamp="1590697623449" />
-    <state width="1579" height="270" key="GridCell.Tab.0.left/0.0.1600.860@0.0.1600.860" timestamp="1590952580878" />
+    <state width="1579" height="367" key="GridCell.Tab.0.left/0.0.1600.860@0.0.1600.860" timestamp="1591132563589" />
     <state width="2539" height="365" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1590950005288" />
-    <state width="1579" height="270" key="GridCell.Tab.0.right" timestamp="1590952580878">
+    <state width="1579" height="367" key="GridCell.Tab.0.right" timestamp="1591132563591">
       <screen x="0" y="0" width="1600" height="860" />
     </state>
     <state width="2539" height="289" key="GridCell.Tab.0.right/0.0.1440.860/1440.0.2560.1400@1440.0.2560.1400" timestamp="1590697623449" />
-    <state width="1579" height="270" key="GridCell.Tab.0.right/0.0.1600.860@0.0.1600.860" timestamp="1590952580878" />
+    <state width="1579" height="367" key="GridCell.Tab.0.right/0.0.1600.860@0.0.1600.860" timestamp="1591132563591" />
     <state width="2539" height="365" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1590950005289" />
     <state width="2539" height="289" key="GridCell.Tab.1.bottom" timestamp="1590345958302">
       <screen x="0" y="0" width="2560" height="1400" />
