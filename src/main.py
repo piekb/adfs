@@ -62,13 +62,14 @@ def get_claim():
 def main(argv):
     print("Hello!")
 
-    cur_path = os.path.dirname(__file__)
+    # Get current working directory and append exercise input file to it
+    cur_path = os.getcwd()
     part = os.path.split(cur_path)[0]
 
     # user_in = input("please enter file name: ")
     user_in = 'adfex7'
     path = part + '/ex/' + user_in
-    # print(path)
+    print(path)
 
     with open(path, 'r') as c:
         contents = c.readlines()
