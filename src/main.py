@@ -67,7 +67,7 @@ def main(argv):
     part = os.path.split(cur_path)[0]
 
     # user_in = input("please enter file name: ")
-    user_in = 'adfex7'
+    user_in = 'adfex6'
     path = part + '/ex/' + user_in
     print(path)
 
@@ -99,6 +99,7 @@ def main(argv):
 
     first = initial_claim
     n = tree.Root(first)
+    k = 0
     updates = forward.forward_step(initial_claim, a_prime)
     for c in updates:
         print(f"New node {c}")
@@ -106,25 +107,34 @@ def main(argv):
     second = updates[0]
     n = n.children[0]
     j = 0
+    k += 1
     while True:
-        print(f"Current node is {n.data}")
+        print(f"v_{k} = {n.data}")
         a_prime, contra, found = myfun.check_info(second, first)
         if contra:
             print("Found a contradiction, will apply backward move")
             n = n.parent
+            k -= 1
+            print(f"parent is {n.data} with {len(n.children)} children")
             if len(n.children) > j + 1:
                 n = n.children[j + 1]
                 second = n.data
+                k += 1
+                print("here now xx")
+                break
             elif type(n) is tree.Root:
                 print("P loses game")
                 break
             else:
                 n = n.parent
+                k -= 1
                 first = n.data
                 print(len(n.children), j + 1)
                 if len(n.children) > j + 1:
                     n = n.children[j + 1]
                     second = n.data
+                    j += 1
+                    k += 1
                 else:
                     print("should go further up")
                     # n = n.parent
@@ -141,6 +151,7 @@ def main(argv):
                 n.add_child(c)
             second = updates[0]
             n = n.children[0]
+            k += 1
 
 
     print("Let's look at the tree so far")

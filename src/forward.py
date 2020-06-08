@@ -33,6 +33,7 @@ def min_info(sats):
         if d[w] == d[sort[0]]:
             min_sats.append(w)
 
+    min_sats.reverse()
     return min_sats
 
 
@@ -46,7 +47,6 @@ def gen_msats(v, a):
     else:
         inters = ext.gen_inters(myfun.size)
         arg_in = myfun.dex(a.name)
-
         for j, inter in enumerate(inters):
             sat = inter[:arg_in] + 'u' + inter[arg_in:]
             v_a = myfun.find_in(v, a)
