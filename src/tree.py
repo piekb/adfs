@@ -1,5 +1,3 @@
-import json
-
 deltas = ['tfu', 'ffu', 'ttt']
 
 class Root(object):

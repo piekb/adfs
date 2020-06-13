@@ -91,5 +91,5 @@ def forward_step(v, a_prime):
     for a in myfun.arguments:
         # print(f"Delta of argument {a.name}")
         out = out + delta(v, a_prime, a)
-    print("Final delta:", out)
+    # print("Final delta:", out)
     return out

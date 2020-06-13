@@ -68,9 +68,9 @@ def find_new(i, v, a_prime):
         try:
             msat[f'{a.name}'] = msats[f'{a.name}'][i]
         except IndexError as error:
-            print("no other mSATs, sorry!")
+            print("No other mSATs, sorry!")
             # return False, {}
-    print("msat", msat)
+    print("mSAT = ", msat)
 
     return msat
 

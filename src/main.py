@@ -70,7 +70,7 @@ def main(argv):
     part = os.path.split(cur_path)[0]
 
     # user_in = input("please enter file name: ")
-    user_in = 'adfex9'
+    user_in = 'adfex10'
     path = part + '/ex/' + user_in
     print(path)
 
@@ -102,7 +102,7 @@ def main(argv):
 
     first = initial_claim
     n = tree.Root(first)
-    k = 0
+    k = 0  # depth
     forward.msat = msat_fun.find_new(n.i, first, a_prime)
     second = forward.forward_step(initial_claim, a_prime)
     # dialogue = [initial_claim, second]
@@ -112,30 +112,29 @@ def main(argv):
     k += 1
     while True:
         print(f"v_{k} = {n.data}")
-        # print(second, first)
         a_prime, contra, found = myfun.check_info(second, first)
         if contra:
             print("Found a contradiction, will apply backward move")
-            if type(n.parent) is tree.Root:
+            n = n.parent
+            k -= 1
+
+            # do
+            if type(n) is tree.Root:
                 print("P loses game")
                 break
-            ## TEST
-            n = n.parent.parent
-            k -= 2
-            print(f"v_{k} = {n.data}")
-
+            n = n.parent
+            k -= 1
+            print(f"Backtracked to v_{k} = {n.data}")
             if type(n) is tree.Root:
-                par = len(n.data)*'u'
+                par = len(n.data) * 'u'
             else:
                 par = n.parent.data
-            print("n", n.data)
-            print("n.p", par)
             a_prime = myfun.check_info(v=n.data, oldv=par)[0]
-            print("aprime:")
+            print("Finding new msat for A' = ")
             myfun.print_args(a_prime)
             result = msat_fun.find_new(n.i + 1, n.data, a_prime)
             if result != {}:
-                print("found another msat:", result)
+                print("Found another msat!")
                 n.i += 1
                 forward.msat = result
                 first = n.data
@@ -143,31 +142,26 @@ def main(argv):
                 n.add_child(second)
                 n = n.children[n.i]
                 k += 1
-                print("for first, second = ", first, second)
-                # break
+            # while ...
             else:
-                print("should go further up")
                 if type(n) is tree.Root:
                     print("P loses game")
                     break
                 else:
-                    # n = n.parent
-
                     while type(n) is not tree.Root and result == {}:
                         n = n.parent
+                        k -= 1
+                        print(f"Backtracked to v_{k} = {n.data}")
                         if type(n) is tree.Root:
                             par = len(n.data) * 'u'
                         else:
                             par = n.parent.data
-                        print("now ", n.data, par)
                         a_prime = myfun.check_info(v=n.data, oldv=par)[0]
-                        print("aprime:")
-                        myfun.print_args(a_prime)
+                        # print("Finding new msat for A' = ")
+                        # myfun.print_args(a_prime)
                         result = msat_fun.find_new(n.i + 1, n.data, a_prime)
-                        k -= 1
-                        print(f"v_{k} = {n.data}")
                     if result != {}:
-                        print("found another msat:", result)
+                        print("Found another msat!")
                         n.i += 1
                         forward.msat = result
                         first = n.data
@@ -175,12 +169,11 @@ def main(argv):
                         n.add_child(second)
                         n = n.children[n.i]
                         k += 1
-                        print("for first, second = ", first, second)
                     else:
                         print("P loses game")
                         break
         elif found:
-            print("Agreement found!")
+            print("Agreement found! P wins the game. ")
             break
         else:
             # not i actually!!
@@ -196,8 +189,7 @@ def main(argv):
             k += 1
             # i += 1
 
-
-    print("Let's look at the tree so far")
+    print("Search tree:")
     while type(n) is not tree.Root:
         n = n.parent
     tree.traverse(n, 0)
