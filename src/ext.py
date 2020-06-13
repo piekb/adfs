@@ -137,6 +137,7 @@ def combine_msats(msats):
     combine_rec(0, [])
 
     new_m = {}
+    # print('hello', full)
     i = 0
     for k in list(msats.keys()):
         x = []
@@ -144,12 +145,17 @@ def combine_msats(msats):
             x.append(n[i])
             # print(n)
         new_m[k] = x
+        # print(k, i)
         i += 1
 
+
+
+    # print("hey", full)
+    # print("ho", new_m)
     return new_m
 
 
-# if __name__ == '__main__':
-#     y = combine_msats(m)
+if __name__ == '__main__':
+    y = combine_msats(m)
 #     print(y)
 #     print(y['b'][4])

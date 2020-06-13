@@ -8,11 +8,13 @@ import sympy
 import myfun
 import forward
 import tree
+import msat_fun
 
 from sympy import *
 from myfun import *
 from forward import *
 from tree import *
+from msat_fun import *
 
 
 class Argument:
@@ -41,13 +43,14 @@ def input_claim():
     print(f"Initial claim: {initial_claim}")
     return initial_claim
 
+
 def get_claim():
     init_arg = input("Please enter argument for initial claim: ")
     claim = input(f"Please enter the truth value of argument {init_arg} in initial claim: ")
     while True:
-        if myfun.dex(init_arg) is not None and re.match('[f,t]', claim):
+        if myfun.dex(init_arg) is not None and re.match('^[f,t]$', claim):
             break
-        elif re.match('[f,t]', claim):
+        elif re.match('^[f,t]$', claim):
             print("Error! Argument does not exist")
             init_arg = input("Please enter argument for initial claim: ")
         else:
@@ -100,58 +103,127 @@ def main(argv):
     first = initial_claim
     n = tree.Root(first)
     k = 0
-    updates = forward.forward_step(initial_claim, a_prime)
-    for c in updates:
-        print(f"New node {c}")
-        n.add_child(c)
-    second = updates[0]
+    i = 0
+    forward.msat = msat_fun.find_new(i, first, a_prime)
+    second = forward.forward_step(initial_claim, a_prime)
+    # dialogue = [initial_claim, second]
+    n.add_child(second)
     n = n.children[0]
     j = 0
     k += 1
     while True:
         print(f"v_{k} = {n.data}")
+        # print(second, first)
         a_prime, contra, found = myfun.check_info(second, first)
         if contra:
             print("Found a contradiction, will apply backward move")
-            n = n.parent
-            k -= 1
-            print(f"parent is {n.data} with {len(n.children)} children")
-            if len(n.children) > j + 1:
-                n = n.children[j + 1]
-                second = n.data
-                k += 1
-                print("here now xx")
-                break
-            elif type(n) is tree.Root:
+            if type(n.parent) is tree.Root:
                 print("P loses game")
                 break
+            ## TEST
+            n = n.parent.parent
+            k-=2
+            print(f"v_{k} = {n.data}")
+
+            if type(n) is tree.Root:
+                par = len(n.data)*'u'
             else:
-                n = n.parent
-                k -= 1
+                par = n.parent.data
+            print("n", n.data)
+            print("n.p", par)
+            a_prime = myfun.check_info(v=n.data, oldv=par)[0]
+            print("aprime:")
+            myfun.print_args(a_prime)
+            result = msat_fun.find_new(i + 1, n.data, a_prime)
+            if result != {}:
+                print("found another msat:", result)
+                i += 1
+                forward.msat = result
                 first = n.data
-                print(len(n.children), j + 1)
-                if len(n.children) > j + 1:
-                    n = n.children[j + 1]
-                    second = n.data
-                    j += 1
-                    k += 1
-                else:
-                    print("should go further up")
-                    # n = n.parent
+                second = forward.forward_step(first, a_prime)
+                n.add_child(second)
+                n = n.children[i]
+                k += 1
+                print("for first, second = ", first, second)
+                # break
+            else:
+                print("should go further up")
+                if type(n) is tree.Root:
+                    print("P loses game")
                     break
+                else:
+                    # n = n.parent
+
+                    while type(n) is not tree.Root and result == {}:
+                        n = n.parent
+                        if type(n) is tree.Root:
+                            par = len(n.data) * 'u'
+                        else:
+                            par = n.parent.data
+                        print("now ", n.data, par)
+                        a_prime = myfun.check_info(v=n.data, oldv=par)[0]
+                        print("aprime:")
+                        myfun.print_args(a_prime)
+                        result = msat_fun.find_new(i + 1, n.data, a_prime)
+                        k -= 1
+                        print(f"v_{k} = {n.data}")
+                    if result != {}:
+                        print("found another msat:", result)
+                        i += 1
+                        forward.msat = result
+                        first = n.data
+                        second = forward.forward_step(first, a_prime)
+                        n.add_child(second)
+                        n = n.children[i]
+                        k += 1
+                        print("for first, second = ", first, second)
+                    else:
+                        print("P loses game")
+                        break
+            ## TEST OVER
+
+            # n = n.parent
+            # k -= 1
+            # print(f"parent is {n.data} with {len(n.children)} children")
+            # if len(n.children) > j + 1:
+            #     n = n.children[j + 1]
+            #     second = n.data
+            #     k += 1
+            #     print("here now xx")
+            #     break
+            # elif type(n) is tree.Root:
+            #     print("P loses game")
+            #     break
+            # else:
+            #     n = n.parent
+            #     k -= 1
+            #     first = n.data
+            #     print(len(n.children), j + 1)
+            #     if len(n.children) > j + 1:
+            #         n = n.children[j + 1]
+            #         second = n.data
+            #         j += 1
+            #         k += 1
+            #     else:
+            #         print("should go further up")
+            #         # n = n.parent
+            #         break
         elif found:
             print("Agreement found!")
             break
         else:
+            # not i actually!!
             print("No contradiction, no agreement found")
             first = second
-            updates = forward.forward_step(first, a_prime)
-            for c in updates:
-                print(f"New node {c}")
-                n.add_child(c)
-            second = updates[0]
+            forward.msat = msat_fun.find_new(0, first, a_prime)
+            # forward.msat = msat_fun.find_new(0, dialogue[i], a_prime)
+            second = forward.forward_step(first, a_prime)
+            # dialogue = dialogue + forward.forward_step(dialogue[i], a_prime)
+            n.add_child(second)
+            # n.add_child(dialogue[i+1])
             n = n.children[0]
             k += 1
+            # i += 1
 
 
     print("Let's look at the tree so far")

@@ -1,6 +1,6 @@
 from sympy import simplify
 
-## Global variables, classes, and functions
+# Global variables, classes, and functions
 arguments = []
 size = 0
 
@@ -30,6 +30,15 @@ def make_one(value, arg):
     new = u[:arg_in] + value + u[arg_in:-1]
 
     return new
+
+
+# Returns {a to Gamma(v)(a)}
+def just_one_gamma(v, a):
+    new = find_in(gamma(v), a)
+    gam = make_one(new, a.name)
+    # if gam.count('u') == myfun.size:
+    #     print("Gamma is also undecided")
+    return gam
 
 
 # Takes expression and interpretation, and returns evaluated expression under interpretation

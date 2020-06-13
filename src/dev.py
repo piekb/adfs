@@ -96,6 +96,53 @@ def combine():
     print(full)
 
 
+# def find_msat(v, a):
+    # phi_a = myfun.phi(a.ac, v)
+    # if f'{a.name}' in msats.keys():
+    #     msat = msats[f'{a.name}'][i]
+    #     if len(msats[f'{a.name}']) <= i:
+    #         print("Hey, that doesn't exist!")
+            # print(f"heya, msat for {a.name} is {msats[f'{a.name}'][i]}")
+            # msat = msats[f'{a.name}'][0]
+        # else:
+        #     print("i = 0 hoor rustig maar tijger")
+        #     print(f"heya, msat for {a.name} is {msats[f'{a.name}'][0]}")
 
+    # if f'{a}' in known_msats.keys():
+    #     msat = known_msats[f'{a}']
+    # else:
+    #     min_sats = gen_msats(v, a)
+    #     if phi_a == True or phi_a == False or len(min_sats) == 0:
+    # Second condition of mSAT_F
+    # msat = just_one_gamma(v, a)
+    # else:
+    #     if len(min_sats) > i:
+    #         print(f"hey, i = {i}, m = {min_sats[i]}")
+    # msat = min_sats[i]
+    # else:
+    #     print("wuh oh")
+    #     msat = min_sats[0]
+    # known_msats[f'{a}'] = msat
 
+    # return msat
 
+# Forward move
+# def forward_step(v, a_prime):
+#     deltas = []
+#     while i < num:
+#         out = ''
+#         for a in myfun.arguments:
+#             print(f"Delta of argument {a.name}")
+#             out = out + delta(v, a_prime, a)
+#         deltas.append(out)
+#         i += 1
+#
+#     out = ''
+#     for a in myfun.arguments:
+#         print(f"Delta of argument {a.name}")
+#         out = out + delta(v, a_prime, a)
+#     print(deltas)
+#     print("Final delta:")
+#     out = deltas[0]
+#     print(out)
+#     return deltas

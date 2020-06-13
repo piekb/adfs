@@ -40,8 +40,6 @@ def test_tree():
     for c in n.children:
         print(c.data, c.parent.data)
 
-
-
 if __name__ == '__main__':
     test_tree()
 
