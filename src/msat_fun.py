@@ -53,7 +53,9 @@ def gen_msats(v, a):
 def find_new(i, v, a_prime):
     found_msats = {}
     for a in a_prime:
+        # found_msats[f'{a.name}'] = input(f"please give msat[{i}] for {a.name} under {v}: ")
         found_msats[f'{a.name}'] = gen_msats(v, a)
+        # print(found_msats[f"{a.name}"])
     # print("keys:")
     # print(list(found_msats.keys()))
     # print("values:")

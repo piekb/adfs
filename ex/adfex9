@@ -1,0 +1,16 @@
+s(a).
+s(b).
+s(c).
+s(d).
+s(e).
+s(f).
+s(g).
+s(h).
+ac(a,or(b,c)).
+ac(b,or(d,e)).
+ac(c,c(v)).
+ac(d,or(f,g,h)).
+ac(e,c(f)).
+ac(f,c(f)).
+ac(g,c(f)).
+ac(h,c(f)).

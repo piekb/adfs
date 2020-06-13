@@ -6,6 +6,7 @@ class Root(object):
     def __init__(self, data):
         self.data = data
         self.children = []
+        self.i = 0
         self.visited = False
 
     def add_child(self, data):
@@ -16,6 +17,7 @@ class Root(object):
 class Node(object):
     def __init__(self, data, parent):
         self.data = data
+        self.i = 0
         self.children = []
         self.visited = False
         self.parent = parent

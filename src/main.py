@@ -70,7 +70,7 @@ def main(argv):
     part = os.path.split(cur_path)[0]
 
     # user_in = input("please enter file name: ")
-    user_in = 'adfex6'
+    user_in = 'adfex9'
     path = part + '/ex/' + user_in
     print(path)
 
@@ -103,8 +103,7 @@ def main(argv):
     first = initial_claim
     n = tree.Root(first)
     k = 0
-    i = 0
-    forward.msat = msat_fun.find_new(i, first, a_prime)
+    forward.msat = msat_fun.find_new(n.i, first, a_prime)
     second = forward.forward_step(initial_claim, a_prime)
     # dialogue = [initial_claim, second]
     n.add_child(second)
@@ -122,7 +121,7 @@ def main(argv):
                 break
             ## TEST
             n = n.parent.parent
-            k-=2
+            k -= 2
             print(f"v_{k} = {n.data}")
 
             if type(n) is tree.Root:
@@ -134,15 +133,15 @@ def main(argv):
             a_prime = myfun.check_info(v=n.data, oldv=par)[0]
             print("aprime:")
             myfun.print_args(a_prime)
-            result = msat_fun.find_new(i + 1, n.data, a_prime)
+            result = msat_fun.find_new(n.i + 1, n.data, a_prime)
             if result != {}:
                 print("found another msat:", result)
-                i += 1
+                n.i += 1
                 forward.msat = result
                 first = n.data
                 second = forward.forward_step(first, a_prime)
                 n.add_child(second)
-                n = n.children[i]
+                n = n.children[n.i]
                 k += 1
                 print("for first, second = ", first, second)
                 # break
@@ -164,50 +163,22 @@ def main(argv):
                         a_prime = myfun.check_info(v=n.data, oldv=par)[0]
                         print("aprime:")
                         myfun.print_args(a_prime)
-                        result = msat_fun.find_new(i + 1, n.data, a_prime)
+                        result = msat_fun.find_new(n.i + 1, n.data, a_prime)
                         k -= 1
                         print(f"v_{k} = {n.data}")
                     if result != {}:
                         print("found another msat:", result)
-                        i += 1
+                        n.i += 1
                         forward.msat = result
                         first = n.data
                         second = forward.forward_step(first, a_prime)
                         n.add_child(second)
-                        n = n.children[i]
+                        n = n.children[n.i]
                         k += 1
                         print("for first, second = ", first, second)
                     else:
                         print("P loses game")
                         break
-            ## TEST OVER
-
-            # n = n.parent
-            # k -= 1
-            # print(f"parent is {n.data} with {len(n.children)} children")
-            # if len(n.children) > j + 1:
-            #     n = n.children[j + 1]
-            #     second = n.data
-            #     k += 1
-            #     print("here now xx")
-            #     break
-            # elif type(n) is tree.Root:
-            #     print("P loses game")
-            #     break
-            # else:
-            #     n = n.parent
-            #     k -= 1
-            #     first = n.data
-            #     print(len(n.children), j + 1)
-            #     if len(n.children) > j + 1:
-            #         n = n.children[j + 1]
-            #         second = n.data
-            #         j += 1
-            #         k += 1
-            #     else:
-            #         print("should go further up")
-            #         # n = n.parent
-            #         break
         elif found:
             print("Agreement found!")
             break
