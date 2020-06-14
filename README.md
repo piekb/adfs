@@ -2,10 +2,19 @@
 Bachelor Project on Abstract Dialectical Frameworks.
 
 # src
-Source code. Main code is main.py
-To compile: 
+Source code. Make sure you are in this folder! Otherwise you cannot run. 
 To run: python main.py
 You will be asked to enter an input file name and initial claim. 
+
+- main.py: main script. Reads input, then runs general algorithm of the game. 
+- tree.py: Tree structure functions.
+- myfun.py: Functions that are used in a variety of other scripts
+- msat_fun.py: Functions relating to finding mSATs. 
+- forward.py: Functions relating to the forward move. 
+- ext.py: Some functions I got from the internet, used for development. 
+	  Two functions are actually used in the code; I will probably move those to myfun.py later. 
+- dev.py: Some commented out parts of code used for development only. 
+	  Just for a back-up in between Git pushes. 
 
 # ex
 Location of example ADF input files. Format:

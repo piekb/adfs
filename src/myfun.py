@@ -36,14 +36,13 @@ def make_one(value, arg):
 def just_one_gamma(v, a):
     new = find_in(gamma(v), a)
     gam = make_one(new, a.name)
-    # if gam.count('u') == myfun.size:
+    # if gam.count('u') == size:
     #     print("Gamma is also undecided")
     return gam
 
 
 # Takes expression and interpretation, and returns evaluated expression under interpretation
 def phi(exp, v):
-    # print(f"expression = {exp} right here")
     if exp == True or exp == False:
         return exp
     else:
@@ -54,31 +53,24 @@ def phi(exp, v):
             elif val == 'f':
                 new = new.subs({arguments[i].sym: False})
 
-        # print(f"found {new} for expression {exp}")
-        # print(new)
-        # print(f'this is {simplify(new)}')
         return simplify(new)
 
 
-# Gamma with args as objects with ac, set_args as symbols
-# For whole set of arguments! So not necessarily >=i
+# Gamma of v. Resulting interpretation of evaluating phi(a) under v
 def gamma(v):
     new = ''
-    # print(v)
     for a in arguments:
         update = phi(a.ac, v)
-        # print(update)
         if update == True:
             new = new + 't'
         elif update == False:
             new = new + 'f'
         else:
             new = new + 'u'
-    # print(new)
     return new
 
 
-# v(a): returns truth value of argument arg in interpretation v
+# v(a): returns truth value of argument arg in any interpretation v
 def find_in(v, arg):
     return v[dex(arg.name)]
 
@@ -90,16 +82,19 @@ def dex(arg_name):
             return a.dex
 
 
+# Prints all arguments and their acceptance conditions in given set
 def print_full_args(set):
     for a in set:
-        print(a.name, ":", a.ac)
+        print(f"phi({a.name}): {a.ac}")
 
 
+# Prints all arguments in given set
 def print_args(set):
     for a in set:
         print(a.name)
 
 
+# Prints the acceptance conditions of all arguments in given set
 def print_acs(set):
     for a in set:
         print(a)

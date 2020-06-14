@@ -50,32 +50,40 @@ def gen_msats(v, a):
     return min_sats
 
 
-def find_new(i, v, a_prime):
-    # found_msats = {}
-    new_msat = {}
+def find_new_m(i, v, a_prime):
+    found_msats = {}
     for a in a_prime:
-        new_msat[f'{a.name}'] = input(f"Please give mSAT option {i} for argument {a.name} under {v}: ")
-        # found_msats[f'{a.name}'] = gen_msats(v, a)
+        found_msats[f'{a.name}'] = gen_msats(v, a)
 
-    # msats = ext.combine_msats(found_msats)
-    # msat = {}
+    msats = ext.combine_msats(found_msats)
+    msat = {}
 
+    for a in a_prime:
+        try:
+            msat[f'{a.name}'] = msats[f'{a.name}'][i]
+        except IndexError as error:
+            print("No other mSATs, sorry!")
+
+    # print("mSAT = ", msat)
     # print("keys:")
     # print(list(found_msats.keys()))
     # print("values:")
     # print(list(found_msats.values()))
     # print(msats)
 
+    return msat
+
+
+def find_new(i, v, a_prime):
+    new_msat = {}
+    for a in a_prime:
+        q = f"\t Please give mSAT option {i+1} for phi({a.name}) under {v}: "
+        if i > 0:
+            q = f"\t \t Please give mSAT option {i + 1} for phi({a.name}) under {v}: "
+        new_msat[f'{a.name}'] = input(q)
+
     for a in a_prime:
         if len(new_msat[f'{a.name}']) == 0:
             return {}
-        # try:
-        #     msat[f'{a.name}'] = msats[f'{a.name}'][i]
-        # except IndexError as error:
-        #     print("No other mSATs, sorry!")
-        #     return {}
 
-    # print("mSAT = ", msat)
-
-    # return msat
     return new_msat

@@ -148,8 +148,6 @@ def combine_msats(msats):
         # print(k, i)
         i += 1
 
-
-
     # print("hey", full)
     # print("ho", new_m)
     return new_m
