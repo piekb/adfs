@@ -50,7 +50,7 @@ def gen_msats(v, a):
     return min_sats
 
 
-def find_new_m(i, v, a_prime):
+def find_new(i, v, a_prime):
     found_msats = {}
     for a in a_prime:
         found_msats[f'{a.name}'] = gen_msats(v, a)
@@ -74,7 +74,7 @@ def find_new_m(i, v, a_prime):
     return msat
 
 
-def find_new(i, v, a_prime):
+def find_new_m(i, v, a_prime):
     new_msat = {}
     for a in a_prime:
         q = f"\t Please give mSAT option {i+1} for phi({a.name}) under {v}: "
@@ -87,3 +87,7 @@ def find_new(i, v, a_prime):
             return {}
 
     return new_msat
+
+
+# IDEA: for parents(a), find indices --> make msat with u's and rand(t,f) in those places. Try until satisfiable.
+# Won't be absolutely minimal though... find all then find minimal? Not sure if still too complex

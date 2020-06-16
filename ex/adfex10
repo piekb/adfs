@@ -9,4 +9,4 @@ ac(b,or(d,e,f)).
 ac(c,c(v)).
 ac(d,c(f)).
 ac(e,c(f)).
-ac(f,c(f)).
+ac(f,or(c(f),c)).
