@@ -48,7 +48,7 @@ def third(v, a_prime, a):
 def fourth(v, a_prime, a):
     for a_i in a_prime:
         msat_ai = find_msat(a_i)
-        print(msat_ai)
+        # print(msat_ai)
         val = myfun.find_in(msat_ai, a)
 
         # Clean up, now there's a double finding val in msat_ai

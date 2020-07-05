@@ -97,7 +97,8 @@ def main(argv):
     myfun.print_full_args(myfun.arguments)
     print("-------------------")
 
-    initial_claim = get_claim()
+    # initial_claim = get_claim()
+    initial_claim = 'uut'
     a_prime = myfun.check_info(initial_claim, myfun.make_one('u', 'a'))[0]
     print(f"v_0 = {initial_claim}")
 
@@ -110,9 +111,11 @@ def main(argv):
     forward.msat_rand = msat_fun.find_new(n.i, initial_claim, a_prime, 1)
 
     update = forward.forward_step(initial_claim, a_prime)
+
     n.add_child(update)
     n = n.children[0]
     k += 1
+    black_list = []
     while True:
         print(f"v_{k} = {n.data}")
         a_prime, contra, found = myfun.check_info(n.data, n.parent.data)
@@ -125,9 +128,10 @@ def main(argv):
             found_msat = False
 
             # Put combination of msats on blacklist
-            # msat_fun.black_list.append(forward.msat_rand)
+            black_list.append(forward.msat_rand)
+            print("blacklist: ", black_list)
             # n.parent.parent.black_list.append(n.parent.data)
-
+            latest = forward.msat_rand
             while not found_msat and type(n) is not tree.Root:
                 n = n.parent
                 k -= 1
@@ -138,21 +142,27 @@ def main(argv):
                     par = n.parent.data
 
                 a_prime = myfun.check_info(v=n.data, oldv=par)[0]
-
                 result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
                 print("result_rand:", result_rand)
-                if result_rand != forward.msat_rand:
+
+                if result_rand not in black_list:
                     found_msat = True
+                else:
+                    print("found", result_rand, "in blacklist")
+                cnt = 0
 
-                # if '' not in result_rand.values():
-                #     found_msat = True
+                if result_rand not in black_list:
+                    found_msat = True
+                # # else, the chance of an unused msat is nil
+                # # ELSE! add previous (which is not msat_rand). !! Give blacklist to nodes.
                 # else:
-                    # No other feasible msat found:
-                    # n.parent.parent.black_list.append(n.parent.data)
+                #     print("adding", n.parent.msat, "to blacklist")
+                #     n.parent.black_list.append(n.parent.msat)
 
-                    # msat_fun.black_list.append(n.data)
-                    # n.black_list.append(result_rand)
-                    # continue
+                # # This does not work because parenting. Also, nil is not 0
+                # while cnt < 2 and not found_msat:
+                #     result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
+                #     cnt += 1
 
             if not found_msat:  # i.e. we're at the root
                 print("P loses game")

@@ -118,7 +118,7 @@ def find_new(i, v, a_prime, choice):
             if msat == frans:
                 frikandel = False
 
-    print(msat)
+    # print(msat)
     return msat
 
 
