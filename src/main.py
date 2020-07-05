@@ -70,7 +70,8 @@ def main(argv):
     part = os.path.split(cur_path)[0]
 
     # user_in = input("Please enter file name: ")
-    user_in = 'adfex10'
+    # print(sys.argv[1])
+    user_in = 'adfex7'
     path = part + '/ex/' + user_in
     # print(path)
 
@@ -100,9 +101,14 @@ def main(argv):
     a_prime = myfun.check_info(initial_claim, myfun.make_one('u', 'a'))[0]
     print(f"v_0 = {initial_claim}")
 
+    # choice = input("How would you like the program to compute mSATs? 0 = blacklist 1 = smart 2 = computation 3 = manually")
+    choice = 2
+
     n = tree.Root(initial_claim)
     k = 0  # depth
-    forward.msat = msat_fun.find_new(n.i, initial_claim, a_prime)
+
+    forward.msat_rand = msat_fun.find_new(n.i, initial_claim, a_prime, 1)
+
     update = forward.forward_step(initial_claim, a_prime)
     n.add_child(update)
     n = n.children[0]
@@ -116,9 +122,12 @@ def main(argv):
                 break
 
             print("Contradiction found, will apply backward move")
-            n = n.parent
-            k -= 1
             found_msat = False
+
+            # Put combination of msats on blacklist
+            # msat_fun.black_list.append(forward.msat_rand)
+            # n.parent.parent.black_list.append(n.parent.data)
+
             while not found_msat and type(n) is not tree.Root:
                 n = n.parent
                 k -= 1
@@ -127,10 +136,23 @@ def main(argv):
                     par = len(n.data) * 'u'
                 else:
                     par = n.parent.data
+
                 a_prime = myfun.check_info(v=n.data, oldv=par)[0]
-                result = msat_fun.find_new(n.i + 1, n.data, a_prime)
-                if result != {}:
+
+                result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
+                print("result_rand:", result_rand)
+                if result_rand != forward.msat_rand:
                     found_msat = True
+
+                # if '' not in result_rand.values():
+                #     found_msat = True
+                # else:
+                    # No other feasible msat found:
+                    # n.parent.parent.black_list.append(n.parent.data)
+
+                    # msat_fun.black_list.append(n.data)
+                    # n.black_list.append(result_rand)
+                    # continue
 
             if not found_msat:  # i.e. we're at the root
                 print("P loses game")
@@ -138,7 +160,8 @@ def main(argv):
             else:
                 print("\t Found another msat!")
                 n.i += 1
-                forward.msat = result
+                # forward.msat = result
+                forward.msat_rand = result_rand
                 update = forward.forward_step(n.data, a_prime)
                 n.add_child(update)
                 n = n.children[n.i]
@@ -148,7 +171,10 @@ def main(argv):
             break
         else:
             print("No contradiction or agreement found, will apply forward move")
-            forward.msat = msat_fun.find_new(0, n.data, a_prime)
+
+            forward.msat_rand = msat_fun.find_new(0, n.data, a_prime, 1)
+            # forward.msat = msat_fun.find_new(0, n.data, a_prime, 2)
+
             update = forward.forward_step(n.data, a_prime)
             n.add_child(update)
             n = n.children[0]

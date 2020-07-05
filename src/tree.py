@@ -19,6 +19,7 @@ class Node(object):
         self.children = []
         self.visited = False
         self.parent = parent
+        self.black_list = []
 
     def add_child(self, data):
         obj = Node(data, self)
@@ -27,7 +28,7 @@ class Node(object):
 
 def traverse(n, i):
     """Depth-first pre-order."""
-    print(i, n.data)
+    print((i*'--'), i, n.data)
     for child in n.children:
         traverse(child, i+1)
 

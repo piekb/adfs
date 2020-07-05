@@ -1,8 +1,13 @@
+from typing import Dict, Any, Union
+
 import myfun
 import ext
+import random
 
 from myfun import *
 from ext import *
+
+black_list = []
 
 
 # Returns the set of mSAT interpretations from a list of SAT interpretations.
@@ -50,7 +55,7 @@ def gen_msats(v, a):
     return min_sats
 
 
-def find_new(i, v, a_prime):
+def msat_comp(i, v, a_prime):
     found_msats = {}
     for a in a_prime:
         found_msats[f'{a.name}'] = gen_msats(v, a)
@@ -70,14 +75,57 @@ def find_new(i, v, a_prime):
     # print("values:")
     # print(list(found_msats.values()))
     # print(msats)
-
     return msat
 
 
-def find_new_m(i, v, a_prime):
+def find_new(i, v, a_prime, choice):
+    msat = {}
+    # arg = a_prime[0]
+    if choice == 3:
+        # do not use
+        msat = msat_manual(i, v, a_prime)
+    elif choice == 2:
+        msat = msat_comp(i, v, a_prime)
+    elif choice == 1:
+        for a in a_prime:
+            msat[f"{a.name}"] = msat_smart(v, a)
+    elif choice == 0:
+        for a in a_prime:
+            msat[f"{a.name}"] = msat_smart(v, a)
+        print("blacklist:", black_list)
+        check = True
+        frikandel = True
+        frans = {}
+        while msat in black_list and frikandel:
+            # print("here now, sup? ")
+            if check:
+                print("checking once:", msat)
+                check = False
+
+            for a in a_prime:
+                phi_a = myfun.phi(a.ac, v)
+                print(phi_a)
+
+                # If phi is T/F then there is no other mSAT
+                if phi_a == True or phi_a == False:
+                    frans[f"{a.name}"] = msat[f"{a.name}"]
+                else:
+                    frans[f"{a.name}"] = msat_smart(v, a)
+
+                frans[f"{a.name}"] = msat_smart(v, a)
+                # if not msat[f"{a.name}"] == frans[f"{a.name}"]:
+                #     msat[f"{a.name}"] = frans[f"{a.name}"]
+            if msat == frans:
+                frikandel = False
+
+    print(msat)
+    return msat
+
+
+def msat_manual(i, v, a_prime):
     new_msat = {}
     for a in a_prime:
-        q = f"\t Please give mSAT option {i+1} for phi({a.name}) under {v}: "
+        q = f"\t Please give mSAT option {i + 1} for phi({a.name}) under {v}: "
         if i > 0:
             q = f"\t \t Please give mSAT option {i + 1} for phi({a.name}) under {v}: "
         new_msat[f'{a.name}'] = input(q)
@@ -89,5 +137,55 @@ def find_new_m(i, v, a_prime):
     return new_msat
 
 
+def msat_random_smart(v, a):
+    msat = ''
+    phi_a = myfun.phi(a.ac, v)
+    if phi_a == True or phi_a == False:
+        # Second condition of mSAT_F
+        msat = myfun.just_one_gamma(v, a)
+    else:
+        msat_random(v, a)
+
+    print("random: ", msat)
+    return msat
+
+
+def msat_random(v, a):
+    msat = ''
+    for j, arg in enumerate(v):
+        if myfun.find_arg(v, j).sym in a.ac.atoms():
+            choices = ['u', 't', 'f']
+            msat = msat + random.choice(choices)
+        else:
+            msat = msat + 'u'
+
+    # print("random: ", msat)
+    return msat
+
+
+# If phi is true or false
+#   If this is the second retry, no other msats exist
+# Else, find some random msat
+def msat_smart(v, a):
+    phi_a = myfun.phi(a.ac, v)
+    # print(phi_a)
+    if phi_a == True or phi_a == False:
+        # Second condition of mSAT_F
+        msat = myfun.just_one_gamma(v, a)
+    else:
+        while True:
+            rand = msat_random(v, a)
+            v_a = myfun.find_in(v, a)
+            gam_a = myfun.find_in(myfun.gamma(rand), a)
+            # print(f"for arg {a.name} v({a.name}) = {v_a}")
+            # print(f"for arg {a.name} gamma({a.name}) = {gam_a}")
+            if v_a == gam_a:
+                break
+        msat = rand
+
+    print("smart: ", msat)
+    return msat
+
 # IDEA: for parents(a), find indices --> make msat with u's and rand(t,f) in those places. Try until satisfiable.
 # Won't be absolutely minimal though... find all then find minimal? Not sure if still too complex
+# Find random msat, but keep track of which have been used and rejected

@@ -10,12 +10,15 @@ def check_info(v, oldv):
     a_prime = []
     contra = False
     found = False
+    # culprits = []
     for i, val in enumerate(v):
         if oldv[i] == 'u':
             if v[i] == 't' or v[i] == 'f':
                 a_prime.append(arguments[i])
         else:
             if v[i] != oldv[i]:
+                # Found an argument whose mSAT is wrong
+                # culprits.append(arguments[i].name)
                 contra = True
     if len(a_prime) == 0:
         # Actually, not found if contradiction. Easier to write it this way though.
@@ -80,6 +83,13 @@ def dex(arg_name):
     for a in arguments:
         if a.name == arg_name:
             return a.dex
+
+
+# Finds the argument at index i in v. Can later get name/sym/ac from this
+def find_arg(v, i):
+    for a in arguments:
+        if a.dex == i:
+            return a
 
 
 # Prints all arguments and their acceptance conditions in given set
