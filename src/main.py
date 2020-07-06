@@ -109,13 +109,14 @@ def main(argv):
     k = 0  # depth
 
     forward.msat_rand = msat_fun.find_new(n.i, initial_claim, a_prime, 1)
+    n.black_list.append(forward.msat_rand)
 
     update = forward.forward_step(initial_claim, a_prime)
 
     n.add_child(update)
     n = n.children[0]
     k += 1
-    black_list = []
+    # black_list = []
     while True:
         print(f"v_{k} = {n.data}")
         a_prime, contra, found = myfun.check_info(n.data, n.parent.data)
@@ -128,11 +129,13 @@ def main(argv):
             found_msat = False
 
             # Put combination of msats on blacklist
-            black_list.append(forward.msat_rand)
-            print("blacklist: ", black_list)
+            # n.parent.black_list.append(forward.msat_rand)
+            # print("blacklist: ", n.parent.black_list, "for parent ", n.parent.data, "of node", n.data)
+
             # n.parent.parent.black_list.append(n.parent.data)
             latest = forward.msat_rand
             while not found_msat and type(n) is not tree.Root:
+                print("blacklist of node", n.data, n.black_list)
                 n = n.parent
                 k -= 1
                 print(f"\t Backtracked to v_{k} = {n.data}")
@@ -142,27 +145,28 @@ def main(argv):
                     par = n.parent.data
 
                 a_prime = myfun.check_info(v=n.data, oldv=par)[0]
-                result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
-                print("result_rand:", result_rand)
+                # result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
+                # print("result_rand:", result_rand)
 
-                if result_rand not in black_list:
-                    found_msat = True
-                else:
-                    print("found", result_rand, "in blacklist")
-                cnt = 0
-
-                if result_rand not in black_list:
-                    found_msat = True
-                # # else, the chance of an unused msat is nil
-                # # ELSE! add previous (which is not msat_rand). !! Give blacklist to nodes.
+                # if result_rand not in n.black_list:
+                #     found_msat = True
                 # else:
-                #     print("adding", n.parent.msat, "to blacklist")
-                #     n.parent.black_list.append(n.parent.msat)
-
-                # # This does not work because parenting. Also, nil is not 0
-                # while cnt < 2 and not found_msat:
-                #     result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
-                #     cnt += 1
+                #     print("found", result_rand, "in blacklist")
+                cnt = 0
+                # # Nil is not 0
+                while cnt < 10 and not found_msat:# and type(n) is not tree.Root:
+                    result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
+                    print("result_rand:", result_rand)
+                    cnt += 1
+                    if result_rand not in n.black_list:
+                        found_msat = True
+                    else:
+                        print("found", result_rand, "in blacklist")
+                    # # else, the chance of an unused msat is nil
+                    # # ELSE! add previous (which is not msat_rand). !! Give blacklist to nodes.
+                    # else:
+                        # print("adding", n.msat, "to blacklist")
+                        # n.black_list.append(result_rand)
 
             if not found_msat:  # i.e. we're at the root
                 print("P loses game")
@@ -172,6 +176,7 @@ def main(argv):
                 n.i += 1
                 # forward.msat = result
                 forward.msat_rand = result_rand
+                n.black_list.append(forward.msat_rand)
                 update = forward.forward_step(n.data, a_prime)
                 n.add_child(update)
                 n = n.children[n.i]
@@ -183,6 +188,7 @@ def main(argv):
             print("No contradiction or agreement found, will apply forward move")
 
             forward.msat_rand = msat_fun.find_new(0, n.data, a_prime, 1)
+            n.black_list.append(forward.msat_rand)
             # forward.msat = msat_fun.find_new(0, n.data, a_prime, 2)
 
             update = forward.forward_step(n.data, a_prime)

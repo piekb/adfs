@@ -6,6 +6,7 @@ class Root(object):
         self.children = []
         self.i = 0
         self.visited = False
+        self.black_list = []
 
     def add_child(self, data):
         obj = Node(data, self)
