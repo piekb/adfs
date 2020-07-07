@@ -39,16 +39,11 @@ def gen_msats(v, a):
         # Second condition of mSAT_F
         sats.append(myfun.just_one_gamma(v, a))
     else:
+        print("inters: ", ext.inters)
         inters = ext.gen_inters(myfun.size)
-        arg_in = myfun.dex(a.name)
         for j, inter in enumerate(inters):
-            sat = inter[:arg_in] + 'u' + inter[arg_in:]
-            v_a = myfun.find_in(v, a)
-            gam_a = myfun.find_in(myfun.gamma(sat), a)
-            # print(f"for arg {a.name} v({a.name}) = {v_a}")
-            # print(f"for arg {a.name} gamma({a.name}) = {gam_a}")
-
-            if v_a == gam_a:
+            sat = inter[:a.dex] + 'u' + inter[a.dex:]
+            if satisfies(v, sat, a):
                 sats.append(sat)
 
     min_sats = min_info(sats)
@@ -75,50 +70,6 @@ def msat_comp(i, v, a_prime):
     # print("values:")
     # print(list(found_msats.values()))
     # print(msats)
-    return msat
-
-
-def find_new(i, v, a_prime, choice):
-    msat = {}
-    # arg = a_prime[0]
-    if choice == 3:
-        # do not use
-        msat = msat_manual(i, v, a_prime)
-    elif choice == 2:
-        msat = msat_comp(i, v, a_prime)
-    elif choice == 1:
-        for a in a_prime:
-            msat[f"{a.name}"] = msat_smart(v, a)
-    elif choice == 0:
-        for a in a_prime:
-            msat[f"{a.name}"] = msat_smart(v, a)
-        print("blacklist:", black_list)
-        check = True
-        frikandel = True
-        frans = {}
-        while msat in black_list and frikandel:
-            # print("here now, sup? ")
-            if check:
-                print("checking once:", msat)
-                check = False
-
-            for a in a_prime:
-                phi_a = myfun.phi(a.ac, v)
-                print(phi_a)
-
-                # If phi is T/F then there is no other mSAT
-                if phi_a == True or phi_a == False:
-                    frans[f"{a.name}"] = msat[f"{a.name}"]
-                else:
-                    frans[f"{a.name}"] = msat_smart(v, a)
-
-                frans[f"{a.name}"] = msat_smart(v, a)
-                # if not msat[f"{a.name}"] == frans[f"{a.name}"]:
-                #     msat[f"{a.name}"] = frans[f"{a.name}"]
-            if msat == frans:
-                frikandel = False
-
-    # print(msat)
     return msat
 
 
@@ -150,6 +101,87 @@ def msat_random_smart(v, a):
     return msat
 
 
+def find_new(i, v, a_prime, choice):
+    msat = {}
+    other_option = False
+    # arg = a_prime[0]
+    if choice == 3:
+        # do not use
+        msat = msat_manual(i, v, a_prime)
+    elif choice == 2:
+        msat = msat_comp(i, v, a_prime)
+        if msat != {}:
+            other_option = True
+    elif choice == 1:
+        for a in a_prime:
+            result = msat_smart(v, a)
+            msat[f"{a.name}"] = result[1]
+            other_option = result[0]
+    elif choice == 0:
+        for a in a_prime:
+            msat[f"{a.name}"] = msat_smart(v, a)
+        print("blacklist:", black_list)
+        check = True
+        frikandel = True
+        frans = {}
+        while msat in black_list and frikandel:
+            # print("here now, sup? ")
+            if check:
+                print("checking once:", msat)
+                check = False
+
+            for a in a_prime:
+                phi_a = myfun.phi(a.ac, v)
+                print(phi_a)
+
+                # If phi is T/F then there is no other mSAT
+                if phi_a == True or phi_a == False:
+                    frans[f"{a.name}"] = msat[f"{a.name}"]
+                else:
+                    frans[f"{a.name}"] = msat_smart(v, a)
+
+                frans[f"{a.name}"] = msat_smart(v, a)
+                # if not msat[f"{a.name}"] == frans[f"{a.name}"]:
+                #     msat[f"{a.name}"] = frans[f"{a.name}"]
+            if msat == frans:
+                frikandel = False
+
+    # print(msat)
+    return other_option, msat
+
+
+# Not super low complexity I think
+def minimal(v, sat, arg):
+    msat = ''
+    compare = sat
+
+    ext.inters = []
+    ext.allKLengthRec(['u', 't', 'f'], "", 3, myfun.size)
+    print("is this taking long? ")
+    new_set = ext.inters
+    for inter in new_set:
+        if inter[arg.dex] == 'u':
+            if inter.count('u') > compare.count('u'):
+                if satisfies(v, inter, arg):
+                    # print(inter)
+                    msat = inter
+                    compare = inter
+
+
+    if msat == '':
+        msat = sat
+
+    return msat
+
+
+def satisfies(v, new_v, a):
+    v_a = myfun.find_in(v, a)
+    gam_a = myfun.find_in(myfun.gamma(new_v), a)
+    # print(f"for arg {a.name} v({a.name}) = {v_a}")
+    # print(f"for arg {a.name} gamma({a.name}) = {gam_a}")
+    return v_a == gam_a
+
+
 def msat_random(v, a):
     msat = ''
     for j, arg in enumerate(v):
@@ -172,19 +204,19 @@ def msat_smart(v, a):
     if phi_a == True or phi_a == False:
         # Second condition of mSAT_F
         msat = myfun.just_one_gamma(v, a)
+        return False, msat
     else:
         while True:
             rand = msat_random(v, a)
-            v_a = myfun.find_in(v, a)
-            gam_a = myfun.find_in(myfun.gamma(rand), a)
-            # print(f"for arg {a.name} v({a.name}) = {v_a}")
-            # print(f"for arg {a.name} gamma({a.name}) = {gam_a}")
-            if v_a == gam_a:
+            if satisfies(v, rand, a):
                 break
         msat = rand
 
-    print("smart: ", msat)
-    return msat
+    mini = minimal(v, msat, a)
+    print("minimal:", mini, "for argument", a.name, ":", a.ac)
+
+    # print("smart: ", msat)
+    return True, mini
 
 # IDEA: for parents(a), find indices --> make msat with u's and rand(t,f) in those places. Try until satisfiable.
 # Won't be absolutely minimal though... find all then find minimal? Not sure if still too complex

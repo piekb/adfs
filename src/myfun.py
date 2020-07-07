@@ -10,15 +10,12 @@ def check_info(v, oldv):
     a_prime = []
     contra = False
     found = False
-    # culprits = []
     for i, val in enumerate(v):
         if oldv[i] == 'u':
             if v[i] == 't' or v[i] == 'f':
                 a_prime.append(arguments[i])
         else:
             if v[i] != oldv[i]:
-                # Found an argument whose mSAT is wrong
-                # culprits.append(arguments[i].name)
                 contra = True
     if len(a_prime) == 0:
         # Actually, not found if contradiction. Easier to write it this way though.
@@ -27,6 +24,7 @@ def check_info(v, oldv):
 
 
 # Returns an interpretation with only arg -> value, and all other args -> u
+# Value is 'x', arg is name
 def make_one(value, arg):
     u = size * 'u'
     arg_in = dex(arg)
@@ -73,9 +71,9 @@ def gamma(v):
     return new
 
 
-# v(a): returns truth value of argument arg in any interpretation v
+# v(a): returns truth value of argument arg (a symbol) in any interpretation v
 def find_in(v, arg):
-    return v[dex(arg.name)]
+    return v[arg.dex]
 
 
 # Finds the index of an argument by name
@@ -83,6 +81,13 @@ def dex(arg_name):
     for a in arguments:
         if a.name == arg_name:
             return a.dex
+
+
+# Finds argument from a symbol. Used because atoms() returns symbols
+def find_from_sym(s):
+    for a in arguments:
+        if a.sym == s:
+            return a
 
 
 # Finds the argument at index i in v. Can later get name/sym/ac from this

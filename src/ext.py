@@ -25,6 +25,7 @@ def allKLengthRec(set, prefix, n, k):
 
 
 def gen_inters(size):
+    # inters = []
     allKLengthRec(['u', 't', 'f'], "", 3, size - 1)
     return inters
 
@@ -32,7 +33,6 @@ def gen_inters(size):
 # Trees:
 #   http://en.wikipedia.org/wiki/Tree_(data_structure)
 #   http://en.wikipedia.org/wiki/Tree_traversal
-#   http://en.wikipedia.org/wiki/Binary_tree
 
 
 class Tree(object):
@@ -60,6 +60,7 @@ def walk_tree_df_postorder(node, visit):
     for child in node.children:
         walk_tree_df_preorder(child, visit)
     visit(node)
+
 
 def test_tree():
     T = Tree

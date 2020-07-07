@@ -26,7 +26,8 @@ class Argument:
 def rewrite(ac):
     iff = ac.replace('iff', 'Equivalent').replace('imp', 'Implies').replace('neg', 'Not')
     tf = iff.replace('and', 'And').replace('or', 'Or').replace('c(v)', 'True').replace('c(f)', 'False')
-
+    print(ac)
+    print(tf)
     # There might be a better way to convert a string to a formula, but for now this works.
     return simplify(tf)
 
@@ -71,7 +72,7 @@ def main(argv):
 
     # user_in = input("Please enter file name: ")
     # print(sys.argv[1])
-    user_in = 'adfex7'
+    user_in = 'adfex12'
     path = part + '/ex/' + user_in
     # print(path)
 
@@ -80,7 +81,7 @@ def main(argv):
         for line in contents:
             if line[0] == 's':
                 a = Argument()
-                a.name = line[2]
+                a.name = line[2:len(line)-3]
                 a.sym = sympy.symbols('{}'.format(a.name))
                 a.dex = myfun.size
 
@@ -88,8 +89,9 @@ def main(argv):
                 myfun.arguments.append(a)
             elif line[0:2] == 'ac':
                 for a in myfun.arguments:
-                    if a.name == line[3]:
-                        a.ac = rewrite(line[5:(len(line) - 3)])
+                    if a.name == line[3:line.find(',')-1]:
+
+                        a.ac = rewrite(line[line.find(',')+1:(len(line) - 3)])
             else:
                 print("Something's wrong with your input file.")
 
@@ -98,17 +100,19 @@ def main(argv):
     print("-------------------")
 
     # initial_claim = get_claim()
-    initial_claim = 'uut'
-    a_prime = myfun.check_info(initial_claim, myfun.make_one('u', 'a'))[0]
+    # initial_claim = 'uut'
+    initial_claim = 't' + 123*'u'
+    a_prime = myfun.check_info(initial_claim, myfun.size*'u')[0]
     print(f"v_0 = {initial_claim}")
 
     # choice = input("How would you like the program to compute mSATs? 0 = blacklist 1 = smart 2 = computation 3 = manually")
-    choice = 2
+    choice = 1
 
     n = tree.Root(initial_claim)
     k = 0  # depth
 
-    forward.msat_rand = msat_fun.find_new(n.i, initial_claim, a_prime, 1)
+    forward.msat_rand = msat_fun.find_new(n.i, initial_claim, a_prime, 1)[1]
+    # forward.msat_rand = msat_fun.find_new(n.i, initial_claim, a_prime, 2)
     n.black_list.append(forward.msat_rand)
 
     update = forward.forward_step(initial_claim, a_prime)
@@ -133,9 +137,9 @@ def main(argv):
             # print("blacklist: ", n.parent.black_list, "for parent ", n.parent.data, "of node", n.data)
 
             # n.parent.parent.black_list.append(n.parent.data)
-            latest = forward.msat_rand
+            # latest = forward.msat_rand
             while not found_msat and type(n) is not tree.Root:
-                print("blacklist of node", n.data, n.black_list)
+                print("Blacklist of node", n.data, n.black_list)
                 n = n.parent
                 k -= 1
                 print(f"\t Backtracked to v_{k} = {n.data}")
@@ -148,25 +152,35 @@ def main(argv):
                 # result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
                 # print("result_rand:", result_rand)
 
+                if choice == 2:
+                    result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 2)[1]
+                    if result_rand != {}:
+                        found_msat = True
+
+                new_msat = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
+                if new_msat[0]:
+                    while not found_msat:
+                        result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)[1]
+                        if result_rand not in n.black_list:
+                            found_msat = True
+                        else:
+                            print("found", result_rand, "in blacklist")
+
                 # if result_rand not in n.black_list:
                 #     found_msat = True
                 # else:
                 #     print("found", result_rand, "in blacklist")
-                cnt = 0
+
                 # # Nil is not 0
-                while cnt < 10 and not found_msat:# and type(n) is not tree.Root:
-                    result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
-                    print("result_rand:", result_rand)
-                    cnt += 1
-                    if result_rand not in n.black_list:
-                        found_msat = True
-                    else:
-                        print("found", result_rand, "in blacklist")
-                    # # else, the chance of an unused msat is nil
-                    # # ELSE! add previous (which is not msat_rand). !! Give blacklist to nodes.
+                # cnt = 0
+                # while cnt < 30 and not found_msat:# and type(n) is not tree.Root:
+                #     result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
+                    # print("result_rand:", result_rand)
+                    # cnt += 1
+                    # if result_rand not in n.black_list:
+                    #     found_msat = True
                     # else:
-                        # print("adding", n.msat, "to blacklist")
-                        # n.black_list.append(result_rand)
+                    #     print("found", result_rand, "in blacklist")
 
             if not found_msat:  # i.e. we're at the root
                 print("P loses game")
@@ -187,9 +201,9 @@ def main(argv):
         else:
             print("No contradiction or agreement found, will apply forward move")
 
-            forward.msat_rand = msat_fun.find_new(0, n.data, a_prime, 1)
+            forward.msat_rand = msat_fun.find_new(0, n.data, a_prime, 1)[1]
+            # forward.msat_rand = msat_fun.find_new(0, n.data, a_prime, 2)
             n.black_list.append(forward.msat_rand)
-            # forward.msat = msat_fun.find_new(0, n.data, a_prime, 2)
 
             update = forward.forward_step(n.data, a_prime)
             n.add_child(update)

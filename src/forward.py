@@ -19,8 +19,9 @@ def find_msat(a):
 
 
 # Returns whether there is any conflict in the "rest" of a-prime without the first defined value.
-def no_conflict(msat_ai, a_prime, a):
-    val_ai = myfun.find_in(msat_ai, a)
+# msat_ai: str, a_prime: [argument], a: argument
+def no_conflict(val_ai, a_prime, a):
+    # val_ai = myfun.find_in(msat_ai, a)
     for a_j in a_prime:
         msat_aj = find_msat(a_j)
         val_aj = myfun.find_in(msat_aj, a)
@@ -38,22 +39,22 @@ def third(v, a_prime, a):
         return False
     else:
         for c in phi_a.atoms():
-            # val_a_c = myfun.find_in(msat_arg, c)
-            if not no_conflict(msat_arg, a_prime, c):
+            parent = myfun.find_from_sym(c)
+            val = myfun.find_in(msat_arg, parent)
+            if not no_conflict(val, a_prime, parent):
                 print("- conflict found -")
                 return False
     return True
 
 
 def fourth(v, a_prime, a):
+    # print("type(a)=", type(a))
     for a_i in a_prime:
         msat_ai = find_msat(a_i)
-        # print(msat_ai)
         val = myfun.find_in(msat_ai, a)
 
-        # Clean up, now there's a double finding val in msat_ai
         if val == 't' or val == 'f':
-            if no_conflict(msat_ai, a_prime, a):
+            if no_conflict(val, a_prime, a):
                 return True, msat_ai
     return False, 0
 
