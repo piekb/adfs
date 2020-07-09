@@ -5,4 +5,4 @@ s(a4).
 ac(a1,or(a2,a3)).
 ac(a2,c(f)).
 ac(a3,c(f)).
-ac(a4,a1).
+ac(a4,c(v)).

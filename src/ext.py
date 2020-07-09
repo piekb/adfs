@@ -8,7 +8,7 @@ inters = []
 def allKLengthRec(set, prefix, n, k):
     # Base case: k is 0,
     # add to set
-    if (k == 0):
+    if k == 0:
         inters.append(prefix)
         return
 

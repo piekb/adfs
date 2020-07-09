@@ -10,6 +10,11 @@ from ext import *
 black_list = []
 
 
+def xprint(string):
+    if myfun.pc == True:
+        print(string)
+
+
 # Returns the set of mSAT interpretations from a list of SAT interpretations.
 def min_info(sats):
     min_sats = []
@@ -104,7 +109,6 @@ def msat_random_smart(v, a):
 def find_new(i, v, a_prime, choice):
     msat = {}
     other_option = False
-    grand_p = 0
     # arg = a_prime[0]
     if choice == 3:
         # do not use
@@ -114,10 +118,23 @@ def find_new(i, v, a_prime, choice):
         if msat != {}:
             other_option = True
     elif choice == 1:
+        other = {}
+        option_havers = []
         for a in a_prime:
             result = msat_smart(v, a)
             msat[f"{a.name}"] = result[1]
-            other_option[f"{a.name}"] = result[0]
+            other[f"{a.name}"] = result[0]
+
+            if result[0]:
+                other_option = True
+                option_havers.append(a)
+        if myfun.pc:
+            if other_option and msat in black_list:
+                print("found", msat, "in blacklist", black_list)
+            elif other_option:
+                print("found", msat, "which is not in blacklist")
+            else:
+                print("there is no other option already")
     elif choice == 0:
         for a in a_prime:
             msat[f"{a.name}"] = msat_smart(v, a)
@@ -148,55 +165,86 @@ def find_new(i, v, a_prime, choice):
                 frikandel = False
 
     # print(msat)
-    return other_option, msat#, grand_p
+    return other_option, msat, option_havers
 
 
 # Not super low complexity I think
 def minimal(v, sat, arg):
-    msat = ''
-    compare = sat
+    msat = sat[0]
+    par_in = sat[1]
 
     ext.inters = []
-    # ext.allKLengthRec(['u', 't', 'f'], "", 3, myfun.size)
+    ext.allKLengthRec(['u', 't', 'f'], "", 3, len(par_in))
+    op = ext.inters[1:]
+    # print("over parents:", op)
+    random.shuffle(op)
+    new = []
+    for inter in op:
+        # print(inter)
+        new_m = ''
+        j = 0
+        for i, _ in enumerate(v):
+            if i in par_in:
+                new_m += inter[j]
+                j += 1
+            else:
+                new_m += 'u'
+        # print("new_m:", new_m)
+        if satisfies(v, new_m, arg):
+            new.append(new_m)
 
-    # Generate all strings of correct length, minus the assignment arg -> u
-    inters = ext.gen_inters(myfun.size)
-    random.shuffle(inters)
-
-    for inter in inters:
-        # Add the assignment arg -> u
-        new_sat = inter[:arg.dex] + 'u' + inter[arg.dex:]
-
-        if new_sat.count('u') > compare.count('u'):
-            if satisfies(v, new_sat, arg):
-                msat = new_sat
-                compare = new_sat
-
-    if msat == '':
-        msat = sat
+        # if new_m.count('u') > msat.count('u'):
+        #     if satisfies(v, new_m, arg):
+        #         msat = new_m
+    msats = min_info(new)
+    if myfun.pc:
+        print(msats)
+    msat = random.choice(msats)
 
     return msat
+
+
+    # Generate all strings of correct length, minus the assignment arg -> u
+    # inters = ext.gen_inters(myfun.size)
+    # random.shuffle(inters)
+    #
+    # for inter in inters:
+    #     # Add the assignment arg -> u
+    #     new_sat = inter[:arg.dex] + 'u' + inter[arg.dex:]
+    #
+    #     if new_sat.count('u') > compare.count('u'):
+    #         if satisfies(v, new_sat, arg):
+    #             msat = new_sat
+    #             compare = new_sat
+    #
+    # if msat == '':
+    #     msat = sat
+    #
+    # return msat
 
 
 def satisfies(v, new_v, a):
     v_a = myfun.find_in(v, a)
     gam_a = myfun.find_in(myfun.gamma(new_v), a)
-    # print(f"for arg {a.name} v({a.name}) = {v_a}")
-    # print(f"for arg {a.name} gamma({a.name}) = {gam_a}")
+    # xprint(f"for arg {a.name} v({a.name}) = {v_a}")
+    # xprint(f"for arg {a.name} gamma({a.name}) = {gam_a}")
     return v_a == gam_a
 
 
 def msat_random(v, a):
-    msat = ''
+    sat = ''
+    par_in = []
+
     for j, arg in enumerate(v):
         if myfun.find_arg(v, j).sym in a.ac.atoms():
             choices = ['u', 't', 'f']
-            msat = msat + random.choice(choices)
+            sat = sat + random.choice(choices)
+            par_in.append(j)
         else:
-            msat = msat + 'u'
+            sat = sat + 'u'
 
     # print("random: ", msat)
-    return msat
+    return sat, par_in
 
 
 # If phi is true or false
@@ -205,10 +253,6 @@ def msat_random(v, a):
 def msat_smart(v, a):
     phi_a = myfun.phi(a.ac, v)
     # print(len(a.ac.atoms()))
-    grand_p = 0
-    for s in a.ac.atoms():
-        p = myfun.find_from_sym(s)
-        grand_p += len(p.ac.atoms())
 
     # print(phi_a)
     if phi_a == True or phi_a == False:
@@ -218,15 +262,15 @@ def msat_smart(v, a):
     else:
         while True:
             rand = msat_random(v, a)
-            if satisfies(v, rand, a):
+            if satisfies(v, rand[0], a):
                 break
-        msat = rand
-
-    mini = minimal(v, msat, a)
-    print("minimal:", mini, "for argument", a.name, ":", a.ac)
+        sat = rand[0]
+        msat = minimal(v, rand, a)
+    if myfun.pc:
+        print("minimal:", msat, "for argument", a.name, ":", a.ac)
 
     # print("smart: ", msat)
-    return True, mini, grand_p
+    return True, msat
 
 # IDEA: for parents(a), find indices --> make msat with u's and rand(t,f) in those places. Try until satisfiable.
 # Won't be absolutely minimal though... find all then find minimal? Not sure if still too complex

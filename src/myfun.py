@@ -3,6 +3,7 @@ from sympy import simplify
 # Global variables, classes, and functions
 arguments = []
 size = 0
+pc = False
 
 
 # Check if oldv <= v between each step
