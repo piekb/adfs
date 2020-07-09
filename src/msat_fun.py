@@ -104,6 +104,7 @@ def msat_random_smart(v, a):
 def find_new(i, v, a_prime, choice):
     msat = {}
     other_option = False
+    grand_p = 0
     # arg = a_prime[0]
     if choice == 3:
         # do not use
@@ -116,7 +117,7 @@ def find_new(i, v, a_prime, choice):
         for a in a_prime:
             result = msat_smart(v, a)
             msat[f"{a.name}"] = result[1]
-            other_option = result[0]
+            other_option[f"{a.name}"] = result[0]
     elif choice == 0:
         for a in a_prime:
             msat[f"{a.name}"] = msat_smart(v, a)
@@ -147,7 +148,7 @@ def find_new(i, v, a_prime, choice):
                 frikandel = False
 
     # print(msat)
-    return other_option, msat
+    return other_option, msat#, grand_p
 
 
 # Not super low complexity I think
@@ -156,17 +157,20 @@ def minimal(v, sat, arg):
     compare = sat
 
     ext.inters = []
-    ext.allKLengthRec(['u', 't', 'f'], "", 3, myfun.size)
-    print("is this taking long? ")
-    new_set = ext.inters
-    for inter in new_set:
-        if inter[arg.dex] == 'u':
-            if inter.count('u') > compare.count('u'):
-                if satisfies(v, inter, arg):
-                    # print(inter)
-                    msat = inter
-                    compare = inter
+    # ext.allKLengthRec(['u', 't', 'f'], "", 3, myfun.size)
 
+    # Generate all strings of correct length, minus the assignment arg -> u
+    inters = ext.gen_inters(myfun.size)
+    random.shuffle(inters)
+
+    for inter in inters:
+        # Add the assignment arg -> u
+        new_sat = inter[:arg.dex] + 'u' + inter[arg.dex:]
+
+        if new_sat.count('u') > compare.count('u'):
+            if satisfies(v, new_sat, arg):
+                msat = new_sat
+                compare = new_sat
 
     if msat == '':
         msat = sat
@@ -200,6 +204,12 @@ def msat_random(v, a):
 # Else, find some random msat
 def msat_smart(v, a):
     phi_a = myfun.phi(a.ac, v)
+    # print(len(a.ac.atoms()))
+    grand_p = 0
+    for s in a.ac.atoms():
+        p = myfun.find_from_sym(s)
+        grand_p += len(p.ac.atoms())
+
     # print(phi_a)
     if phi_a == True or phi_a == False:
         # Second condition of mSAT_F
@@ -216,7 +226,7 @@ def msat_smart(v, a):
     print("minimal:", mini, "for argument", a.name, ":", a.ac)
 
     # print("smart: ", msat)
-    return True, mini
+    return True, mini, grand_p
 
 # IDEA: for parents(a), find indices --> make msat with u's and rand(t,f) in those places. Try until satisfiable.
 # Won't be absolutely minimal though... find all then find minimal? Not sure if still too complex

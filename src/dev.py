@@ -146,3 +146,64 @@ def combine():
 #     out = deltas[0]
 #     print(out)
 #     return deltas
+
+# def rewrite(ac):
+#     iff = ac.replace('iff', 'Equivalent').replace('imp', 'Implies').replace('neg', 'Not')
+#     tf = iff.replace('and', 'And').replace('or', 'Or').replace('c(v)', 'True').replace('c(f)', 'False')
+#     new = ''
+#     argu = ''
+#     start = False
+    # for i in tf:
+    #     if not start:
+    #         new = new + i
+    #     else:
+    #         argu = argu + i
+    #
+    #     if i == '(':
+    #         start = True
+    #         # new = new + i
+    #     elif i == ')':
+    #         new = new + sympy.symbols(argu) + i
+    #         argu = ''
+    #         start = False
+    #     elif i == ',':
+    #         new = new + sympy.symbols(argu) + i
+    #         argu = ''
+    #
+    #     else:
+
+
+
+
+
+        # if i != '(' and i != ')' and i != ',':
+        #     try:
+        #         new = new + sympify(i)
+        #     except TypeError:
+                # new = new + sympify('Not(Not(i))')
+                # print("hello")
+                # print("type of", i, "is", type(i))
+                # j = 1
+                # new = new + i
+        # else:
+        #     new = new + i
+        # print(i, type(i))
+        # if type(i) is not str:
+        #     print(type(i))
+    # print(tf)
+    # x = sympy.symbols('3')
+    # print("here")
+    # print(simplify(f"Or(a,3)"))
+    # # print(Not(Not(tf)))
+    # print(new)
+    # print("done")
+
+    # There might be a better way to convert a string to a formula, but for now this works.
+    # try:
+    #     simplify(tf)
+    # except TypeError as error:
+    #     print(type(tf))
+    # s = simplify(tf)
+    # print(s)
+    # return simplify(tf)
+    # return new

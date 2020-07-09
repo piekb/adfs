@@ -26,8 +26,7 @@ class Argument:
 def rewrite(ac):
     iff = ac.replace('iff', 'Equivalent').replace('imp', 'Implies').replace('neg', 'Not')
     tf = iff.replace('and', 'And').replace('or', 'Or').replace('c(v)', 'True').replace('c(f)', 'False')
-    print(ac)
-    print(tf)
+
     # There might be a better way to convert a string to a formula, but for now this works.
     return simplify(tf)
 
@@ -82,15 +81,17 @@ def main(argv):
             if line[0] == 's':
                 a = Argument()
                 a.name = line[2:len(line)-3]
-                a.sym = sympy.symbols('{}'.format(a.name))
+                a.sym = sympy.symbols(f"{a.name}")
                 a.dex = myfun.size
 
                 myfun.size += 1
                 myfun.arguments.append(a)
             elif line[0:2] == 'ac':
                 for a in myfun.arguments:
-                    if a.name == line[3:line.find(',')-1]:
-
+                    if a.name == line[3:line.find(',')]:
+                        # print(a.dex, a.name, a.sym)
+                        # print(sympy.symbols(f"{a.name}"))
+                        # print("line:", line[line.find(',')+1:(len(line) - 3)])
                         a.ac = rewrite(line[line.find(',')+1:(len(line) - 3)])
             else:
                 print("Something's wrong with your input file.")
@@ -101,7 +102,7 @@ def main(argv):
 
     # initial_claim = get_claim()
     # initial_claim = 'uut'
-    initial_claim = 't' + 123*'u'
+    initial_claim = 't' + (myfun.size-1)*'u'
     a_prime = myfun.check_info(initial_claim, myfun.size*'u')[0]
     print(f"v_0 = {initial_claim}")
 
@@ -110,17 +111,16 @@ def main(argv):
 
     n = tree.Root(initial_claim)
     k = 0  # depth
+    winner = ''
 
     forward.msat_rand = msat_fun.find_new(n.i, initial_claim, a_prime, 1)[1]
     # forward.msat_rand = msat_fun.find_new(n.i, initial_claim, a_prime, 2)
     n.black_list.append(forward.msat_rand)
 
     update = forward.forward_step(initial_claim, a_prime)
-
     n.add_child(update)
     n = n.children[0]
     k += 1
-    # black_list = []
     while True:
         print(f"v_{k} = {n.data}")
         a_prime, contra, found = myfun.check_info(n.data, n.parent.data)
@@ -158,13 +158,18 @@ def main(argv):
                         found_msat = True
 
                 new_msat = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
+                # n.grand_p = new_msat[2]
+
                 if new_msat[0]:
-                    while not found_msat:
-                        result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)[1]
-                        if result_rand not in n.black_list:
-                            found_msat = True
-                        else:
-                            print("found", result_rand, "in blacklist")
+                    if new_msat[1] not in n.black_list:
+                        found_msat = True
+                    else:
+                        while not found_msat:
+                            result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)[1]
+                            if result_rand not in n.black_list:
+                                found_msat = True
+                            else:
+                                print("found", result_rand, "in blacklist")
 
                 # if result_rand not in n.black_list:
                 #     found_msat = True
@@ -196,6 +201,7 @@ def main(argv):
                 n = n.children[n.i]
                 k += 1
         elif found:
+            winner = n.data
             print("Agreement found! P wins the game.")
             break
         else:
@@ -216,6 +222,17 @@ def main(argv):
         n = n.parent
     tree.traverse(n, 0)
 
+    print("-------------------")
+    if winner != '':
+        string = ''
+        for j, w in enumerate(winner):
+            if w != 'u':
+                if string != '':
+                    string = string + ','
+                else:
+                    string = string + '{'
+                string = string + myfun.find_arg(winner, j).name + '->' + w
+        print("Interpretation: ", string+'}')
     print("-------------------")
     print("Bye!")
 
