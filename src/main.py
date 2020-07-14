@@ -5,6 +5,7 @@ import os
 import re
 import sympy
 import time
+import random
 import myfun
 import forward
 import tree
@@ -77,7 +78,7 @@ def main(argv):
 
     # user_in = input("Please enter file name: ")
     # print(sys.argv[1])
-    user_in = 'adfex10'
+    user_in = 'adfex15'
     path = part + '/ex/' + user_in
     # print(path)
 
@@ -105,10 +106,12 @@ def main(argv):
             else:
                 print("Something's wrong with your input file.")
 
-    xprint('Arguments in ADF:')
     if myfun.pc:
+        print('Arguments in ADF:')
         myfun.print_full_args(myfun.arguments)
-    xprint("-------------------")
+        print("-------------------")
+
+    # choice = input("How should the program find mSATs? 0 = computation 1 = completely random")
 
     # initial_claim = get_claim()
     # initial_claim = 'uut'
@@ -116,16 +119,20 @@ def main(argv):
     a_prime = myfun.check_info(initial_claim, myfun.size*'u')[0]
     xprint(f"v_0 = {initial_claim}")
 
-    # choice = input("How would you like the program to compute mSATs? 0 = blacklist 1 = smart 2 = computation 3 = manually")
-    choice = 1
-
     n = tree.Root(initial_claim)
     k = 0  # depth
     winner = ''
 
-    forward.msat_rand = msat_fun.find_new(n.i, initial_claim, a_prime, 1)[1]
-    # forward.msat_rand = msat_fun.find_new(n.i, initial_claim, a_prime, 2)
-    n.black_list.append(forward.msat_rand)
+    def get_m():
+        n.num, n.msats = msat_fun.find_new(n.i, n.data, a_prime, 0)
+        i = random.choice(range(n.num))
+        forward.msat_rand = {}
+        for a in a_prime:
+            forward.msat_rand[f'{a.name}'] = n.msats[f'{a.name}'][i]
+            n.msats[f'{a.name}'].remove(forward.msat_rand[f'{a.name}'])
+        n.num -= 1
+        n.black_list.append(forward.msat_rand)
+    get_m()
 
     update = forward.forward_step(initial_claim, a_prime)
     n.add_child(update)
@@ -142,12 +149,6 @@ def main(argv):
             xprint("Contradiction found, will apply backward move")
             found_msat = False
 
-            # Put combination of msats on blacklist
-            # n.parent.black_list.append(forward.msat_rand)
-            # print("blacklist: ", n.parent.black_list, "for parent ", n.parent.data, "of node", n.data)
-
-            # n.parent.parent.black_list.append(n.parent.data)
-            # latest = forward.msat_rand
             while not found_msat and type(n) is not tree.Root:
                 n = n.parent
                 k -= 1
@@ -158,48 +159,22 @@ def main(argv):
                     par = n.parent.data
 
                 a_prime = myfun.check_info(v=n.data, oldv=par)[0]
-                # result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
-                # print("result_rand:", result_rand)
 
-                if choice == 2:
-                    result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 2)[1]
-                    if result_rand != {}:
-                        found_msat = True
+                # msat_fun.black_list = n.black_list
+                if n.msats[f'{a_prime[0].name}']:
+                    i = random.choice(range(n.num))
+                    # print("chose", i, "for i")
+                    # print(n.msats)
+                    try_msat = {}
+                    for a in a_prime:
+                        try_msat[f'{a.name}'] = n.msats[f'{a.name}'][i]
+                        n.msats[f'{a.name}'].remove(try_msat[f'{a.name}'])
+                    n.num -= 1
 
-                msat_fun.black_list = n.black_list
-                new_msat = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
-                result_rand = new_msat[1]
-                # print("result:", result_rand)
-
-                if new_msat[0]:
-                    if new_msat[1] not in n.black_list:
+                    if try_msat not in n.black_list:
                         found_msat = True
                     else:
-                        while not found_msat and new_msat[0]:
-                            new_msat = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
-                            result_rand = new_msat[1]
-                            if result_rand not in n.black_list:
-                                found_msat = True
-                            elif myfun.pc:
-                                print("found", result_rand, "in blacklist")
-                # else:
-                #     print("no other options")
-
-                # if result_rand not in n.black_list:
-                #     found_msat = True
-                # else:
-                #     print("found", result_rand, "in blacklist")
-
-                # # Nil is not 0
-                # cnt = 0
-                # while cnt < 30 and not found_msat:# and type(n) is not tree.Root:
-                #     result_rand = msat_fun.find_new(n.i + 1, n.data, a_prime, 1)
-                    # print("result_rand:", result_rand)
-                    # cnt += 1
-                    # if result_rand not in n.black_list:
-                    #     found_msat = True
-                    # else:
-                    #     print("found", result_rand, "in blacklist")
+                        print("what?", try_msat, n.black_list, n.msats)
 
             if not found_msat:  # i.e. we're at the root
                 xprint("P loses game")
@@ -208,7 +183,8 @@ def main(argv):
                 xprint("\t Found another msat!")
                 n.i += 1
                 # forward.msat = result
-                forward.msat_rand = result_rand
+                # forward.msat_rand = result_rand
+                forward.msat_rand = try_msat
                 n.black_list.append(forward.msat_rand)
                 update = forward.forward_step(n.data, a_prime)
                 n.add_child(update)
@@ -221,41 +197,51 @@ def main(argv):
         else:
             xprint("No contradiction or agreement found, will apply forward move")
 
-            forward.msat_rand = msat_fun.find_new(0, n.data, a_prime, 1)[1]
-            # forward.msat_rand = msat_fun.find_new(0, n.data, a_prime, 2)
-            n.black_list.append(forward.msat_rand)
+            get_m()
 
             update = forward.forward_step(n.data, a_prime)
             n.add_child(update)
             n = n.children[0]
             k += 1
 
-    xprint("-------------------")
-    xprint("Search tree:")
     if myfun.pc:
+        print("-------------------")
+        print("Search tree:")
+
         while type(n) is not tree.Root:
             n = n.parent
         tree.traverse(n, 0)
 
-    xprint("-------------------")
+        print("-------------------")
+        if winner != '':
+            string = ''
+            for j, w in enumerate(winner):
+                if w != 'u':
+                    if string != '':
+                        string = string + ','
+                    else:
+                        string = string + '{'
+                    string = string + myfun.find_arg(winner, j).name + '->' + w
+            print("Interpretation: %s " % string+'}')
+        print("-------------------")
+        print("Bye!")
     if winner != '':
-        string = ''
-        for j, w in enumerate(winner):
-            if w != 'u':
-                if string != '':
-                    string = string + ','
-                else:
-                    string = string + '{'
-                string = string + myfun.find_arg(winner, j).name + '->' + w
-        xprint("Interpretation: %s " % string+'}')
-    xprint("-------------------")
-    xprint("Bye!")
+        print("YES")
+    else:
+        print("NO")
 
 
 if __name__ == '__main__':
-    choice = int(input("How many times would you like to run the program? "))
-    if input("Would you like to print?") == 'y':
-        myfun.pc = True
+    # myfun.pc = True
+    # start_time = time.time()
+    # main(sys.argv)
+    # t = time.time() - start_time
+    # print("--- %s seconds ---" % t)
+
+    # choice = int(input("How many times would you like to run the program? "))
+    choice = 50
+    # if input("Would you like to print?") == 'y':
+    #     myfun.pc = True
     if choice < 1:
         print("Okay, bye")
     elif choice == 1:
@@ -270,7 +256,8 @@ if __name__ == '__main__':
             start_time = time.time()
             main(sys.argv)
             t = time.time() - start_time
+            # print(t)
             times.append(t)
             c += 1
         # print(times)
-        print("av: ", sum(times)/len(times))
+        print("Average computation time: ", sum(times)/len(times))

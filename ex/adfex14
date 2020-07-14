@@ -5,13 +5,13 @@ s(efs).
 s(putin).
 s(x).
 s(w).
-s(s2).
+s(s).
 s(c3).
 s(d1).
 ac(putin,c(f)).
 ac(a,c).
-ac(s2,or(efs,putin)).
-ac(c,s2).
+ac(s,or(d,c3,putin)).
+ac(c,s).
 ac(efs,c(v)).
 ac(x,w).
 ac(w,x).

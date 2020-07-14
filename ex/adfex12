@@ -2,7 +2,7 @@ s(a1).
 s(a2).
 s(a3).
 s(a4).
-ac(a1,or(a2,a3)).
+ac(a1,or(a2,a3,a4)).
 ac(a2,c(f)).
 ac(a3,c(f)).
-ac(a4,c(v)).
+ac(a4,c(f)).

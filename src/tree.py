@@ -21,6 +21,8 @@ class Node(object):
         self.visited = False
         self.parent = parent
         self.black_list = []
+        self.msats = {}
+        self.num = 0
 
     def add_child(self, data):
         obj = Node(data, self)

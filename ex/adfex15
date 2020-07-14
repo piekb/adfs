@@ -1,0 +1,8 @@
+s(a).
+s(c).
+s(s).
+s(d).
+ac(a,c).
+ac(s,or(d,c)).
+ac(c,s).
+ac(d,d).

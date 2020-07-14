@@ -91,13 +91,6 @@ def find_from_sym(s):
             return a
 
 
-# Finds the argument at index i in v. Can later get name/sym/ac from this
-def find_arg(v, i):
-    for a in arguments:
-        if a.dex == i:
-            return a
-
-
 # Prints all arguments and their acceptance conditions in given set
 def print_full_args(set):
     for a in set:
