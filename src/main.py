@@ -78,7 +78,7 @@ def main(argv):
 
     # user_in = input("Please enter file name: ")
     # print(sys.argv[1])
-    user_in = 'adfex15'
+    user_in = 'adfex7'
     path = part + '/ex/' + user_in
     # print(path)
 
@@ -99,9 +99,6 @@ def main(argv):
             elif line[0:2] == 'ac':
                 for a in myfun.arguments:
                     if a.name == line[3:line.find(',')]:
-                        # print(a.dex, a.name, a.sym)
-                        # print(sympy.symbols(f"{a.name}"))
-                        # print("line:", line[line.find(',')+1:(len(line) - 3)])
                         a.ac = rewrite(line[line.find(',')+1:(len(line) - 3)])
             else:
                 print("Something's wrong with your input file.")
@@ -114,8 +111,8 @@ def main(argv):
     # choice = input("How should the program find mSATs? 0 = computation 1 = completely random")
 
     # initial_claim = get_claim()
-    # initial_claim = 'uut'
-    initial_claim = 't' + (myfun.size-1)*'u'
+    initial_claim = 'uut'
+    # initial_claim = 't' + (myfun.size-1)*'u'
     a_prime = myfun.check_info(initial_claim, myfun.size*'u')[0]
     xprint(f"v_0 = {initial_claim}")
 
@@ -124,7 +121,7 @@ def main(argv):
     winner = ''
 
     def get_m():
-        n.num, n.msats = msat_fun.find_new(n.i, n.data, a_prime, 0)
+        n.num, n.msats = msat_fun.find_new(n.data, a_prime, alg)
         i = random.choice(range(n.num))
         forward.msat_rand = {}
         for a in a_prime:
@@ -160,21 +157,29 @@ def main(argv):
 
                 a_prime = myfun.check_info(v=n.data, oldv=par)[0]
 
-                # msat_fun.black_list = n.black_list
-                if n.msats[f'{a_prime[0].name}']:
-                    i = random.choice(range(n.num))
-                    # print("chose", i, "for i")
-                    # print(n.msats)
+                if alg == 3:
+                    while try_msat not in n.black_list:
+                        try_msat = msat_fun.find_new(n.data, a_prime, 3)[1]
+                elif alg == 1:
+                    trying_msat = msat_fun.find_new(n.data, a_prime, 1)[1]
                     try_msat = {}
                     for a in a_prime:
-                        try_msat[f'{a.name}'] = n.msats[f'{a.name}'][i]
-                        n.msats[f'{a.name}'].remove(try_msat[f'{a.name}'])
-                    n.num -= 1
-
+                        try_msat[f'{a.name}'] = trying_msat[f'{a.name}'][0]
                     if try_msat not in n.black_list:
                         found_msat = True
-                    else:
-                        print("what?", try_msat, n.black_list, n.msats)
+                else:
+                    if n.msats[f'{a_prime[0].name}']:
+                        i = random.choice(range(n.num))
+                        try_msat = {}
+                        for a in a_prime:
+                            try_msat[f'{a.name}'] = n.msats[f'{a.name}'][i]
+                            n.msats[f'{a.name}'].remove(try_msat[f'{a.name}'])
+                        n.num -= 1
+
+                        if try_msat not in n.black_list:
+                            found_msat = True
+                        else:
+                            print("what?", try_msat, n.black_list, n.msats)
 
             if not found_msat:  # i.e. we're at the root
                 xprint("P loses game")
@@ -221,7 +226,7 @@ def main(argv):
                         string = string + ','
                     else:
                         string = string + '{'
-                    string = string + myfun.find_arg(winner, j).name + '->' + w
+                    string = string + myfun.arguments[j].name + '->' + w
             print("Interpretation: %s " % string+'}')
         print("-------------------")
         print("Bye!")
@@ -238,8 +243,10 @@ if __name__ == '__main__':
     # t = time.time() - start_time
     # print("--- %s seconds ---" % t)
 
+    # alg = int(input("Which algorithm for finding mSAT would you like to use? 0 = smart computation 1 = random 2 = dumb computation"))
     # choice = int(input("How many times would you like to run the program? "))
-    choice = 50
+    alg = 2
+    choice = 20
     # if input("Would you like to print?") == 'y':
     #     myfun.pc = True
     if choice < 1:

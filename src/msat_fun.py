@@ -43,6 +43,25 @@ def min_info(sats):
 
 
 # Generates set of minimal satisfiable interpretations for argument a under interpretation v.
+def gen_msats(v, a):
+    sats = []
+    phi_a = myfun.phi(a.ac, v)
+    if phi_a == True or phi_a == False:
+        # Second condition of mSAT_F
+        sats.append(myfun.just_one_gamma(v, a))
+    else:
+        print("inters: ", ext.inters)
+        inters = ext.gen_inters(myfun.size)
+        for j, inter in enumerate(inters):
+            sat = inter[:a.dex] + 'u' + inter[a.dex:]
+            if satisfies(v, sat, a):
+                sats.append(sat)
+
+    min_sats = min_info(sats)
+    return min_sats
+
+
+# Generates set of minimal satisfiable interpretations for argument a under interpretation v.
 # Complexity optimized by bottom-up search for minimality
 def msat_comp(v, arg):
     ext.inters = []
@@ -70,48 +89,28 @@ def msat_comp(v, arg):
     return msats
 
 
-def find_new(i, v, a_prime, choice):
-    msat = {}
-    other_option = False
-    if choice == 2:
-        msat = msat_comp(i, v, a_prime)
-        if msat != {}:
-            other_option = True
-    elif choice == 1:
-        other = {}
-        option_havers = []
-        for a in a_prime:
-            result = msat_smart(v, a)
-            msat[f"{a.name}"] = result[1]
-            other[f"{a.name}"] = result[0]
-
-            if result[0]:
-                other_option = True
-                option_havers.append(a)
-        if myfun.pc:
-            if other_option and msat in black_list:
-                print("found", msat, "in blacklist", black_list)
-            elif other_option:
-                print("found", msat, "which is not in blacklist")
-            else:
-                print("there is no other option already")
-    elif choice == 0:
-        # Hardcode-y version
-        msats = {}
-        for a in a_prime:
-            phi_a = myfun.phi(a.ac, v)
-            if phi_a == True or phi_a == False:
-                # Second condition of mSAT_F; there is no other mSAT
-                m = []
-                m.append(myfun.just_one_gamma(v, a))
+def find_new(v, a_prime, choice):
+    msats = {}
+    for a in a_prime:
+        phi_a = myfun.phi(a.ac, v)
+        if phi_a == True or phi_a == False:
+            # Second condition of mSAT_F; there is no other mSAT
+            m = [myfun.just_one_gamma(v, a)]
+            msats[f"{a.name}"] = m
+        else:
+            # Computation over all arguments
+            if choice == 2:
+                msats[f"{a.name}"] = gen_msats(v, a)
+            # One SAT (not minimal) randomly generated over parents of a in A'
+            elif choice == 1:
+                m = [msat_smart(v, a)]
                 msats[f"{a.name}"] = m
-            else:
+            # Smarter computation over parents of a in A'
+            elif choice == 0:
                 msats[f"{a.name}"] = msat_comp(v, a)
-
-        result = ext.combine_msats(msats)
-        num = len(result[f"{a_prime[0].name}"])
-        # print(result, "with length", num)
-        return num, result
+    result = ext.combine_msats(msats)
+    num = len(result[f"{a_prime[0].name}"])
+    return num, result
 
 
 # Not super low complexity I think
@@ -158,32 +157,25 @@ def msat_random(v, a):
     par_in = []
 
     for j, arg in enumerate(v):
-        if myfun.find_arg(v, j).sym in a.ac.atoms():
+        if myfun.arguments[j].sym in a.ac.atoms():
             choices = ['u', 't', 'f']
             sat = sat + random.choice(choices)
             par_in.append(j)
         else:
             sat = sat + 'u'
 
-    # print("random: ", msat)
     return sat, par_in
 
 
 def msat_smart(v, a):
-    phi_a = myfun.phi(a.ac, v)
-    if phi_a == True or phi_a == False:
-        # Second condition of mSAT_F
-        msat = myfun.just_one_gamma(v, a)
-        return False, msat
-    else:
-        while True:
-            rand = msat_random(v, a)
-            if satisfies(v, rand[0], a):
-                break
-        msats = minimal(v, rand, a)
-    # print("minimal:", msat, "for argument", a.name, ":", a.ac)
+    while True:
+        rand = msat_random(v, a)
+        if satisfies(v, rand[0], a):
+            break
+    # msats = minimal(v, rand, a)
 
-    return True, msats
+    # return msats
+    return rand[0]
 
 # IDEA: for parents(a), find indices --> make msat with u's and rand(t,f) in those places. Try until satisfiable.
 # Won't be absolutely minimal though... find all then find minimal? Not sure if still too complex
