@@ -43,27 +43,63 @@ def min_info(sats):
 
 
 # Generates set of minimal satisfiable interpretations for argument a under interpretation v.
-def gen_msats(v, a):
-    sats = []
-    phi_a = myfun.phi(a.ac, v)
-    if phi_a == True or phi_a == False:
-        # Second condition of mSAT_F
-        sats.append(myfun.just_one_gamma(v, a))
-    else:
-        print("inters: ", ext.inters)
-        inters = ext.gen_inters(myfun.size)
-        for j, inter in enumerate(inters):
-            sat = inter[:a.dex] + 'u' + inter[a.dex:]
-            if satisfies(v, sat, a):
-                sats.append(sat)
+def msat_comp_4(v, a):
+    msats = []
+    inters = sort_this(ext.gen_inters(myfun.size-1))
+    cnt = myfun.size-2
+    for inter in inters:
+        if inter.count('u') < cnt:
+            if msats:
+                break
+            else:
+                # When e.g. phi(a) = b & c, just one t/f doesn't satisfy it
+                cnt -= 1
+        sat = inter[:a.dex] + 'u' + inter[a.dex:]
+        if satisfies(v, sat, a):
+            msats.append(sat)
 
-    min_sats = min_info(sats)
-    return min_sats
+    # msats = min_info(sats)
+    return msats
+
+
+# Generates set of minimal satisfiable interpretations for argument a under interpretation v.
+def msat_comp_3(v, a):
+    sats = []
+    inters = ext.gen_inters(myfun.size-1)
+    for inter in inters:
+        sat = inter[:a.dex] + 'u' + inter[a.dex:]
+        if satisfies(v, sat, a):
+            sats.append(sat)
+
+    msats = min_info(sats)
+    return msats
+
+
+# Generates set of minimal satisfiable interpretations for argument a under interpretation v.
+def msat_comp_2(v, arg):
+    ext.inters = []
+    num_par = len(arg.ac.atoms())
+    inters = sort_this(ext.gen_inters(num_par)[1:])
+    sats = []
+    for inter in inters:
+        new_inter = ''
+        j = 0
+        # This part is still quite slow
+        for i, _ in enumerate(v):
+            if myfun.arguments[i].sym in arg.ac.atoms():
+                new_inter += inter[j]
+                j += 1
+            else:
+                new_inter += 'u'
+        if satisfies(v, new_inter, arg):
+            sats.append(new_inter)
+    msats = min_info(sats)
+    return msats
 
 
 # Generates set of minimal satisfiable interpretations for argument a under interpretation v.
 # Complexity optimized by bottom-up search for minimality
-def msat_comp(v, arg):
+def msat_comp_1(v, arg):
     ext.inters = []
     num_par = len(arg.ac.atoms())
     inters = sort_this(ext.gen_inters(num_par)[1:])
@@ -74,6 +110,7 @@ def msat_comp(v, arg):
             if msats:
                 break
             else:
+                # When e.g. phi(a) = b & c, just one t/f doesn't satisfy it
                 cnt -= 1
         new_inter = ''
         j = 0
@@ -89,7 +126,63 @@ def msat_comp(v, arg):
     return msats
 
 
-def find_new(v, a_prime, choice):
+# New idea
+def msat_comp_6(v, arg):
+    ext.inters = []
+    num_par = len(arg.ac.atoms())
+    inters = ext.gen_inters(num_par)[1:]
+    msats = []
+    cnt = num_par - 1
+
+    inter = random.choice(inters)
+    new_inter = ''
+
+    def find_random():
+        new_inter = ''
+        j = 0
+        # This part is still quite slow
+        for i, _ in enumerate(v):
+            if myfun.arguments[i].sym in arg.ac.atoms():
+                new_inter += inter[j]
+                j += 1
+            else:
+                new_inter += 'u'
+
+    find_random()
+    while not satisfies(v, new_inter, arg):
+        inter = random.choice(inters)
+        find_random()
+    # print(new_inter)
+
+
+# New idea
+def msat_comp_5(idx, v, arg):
+    ext.inters = []
+    num_par = len(arg.ac.atoms())
+    inters = sort_this(ext.gen_inters(num_par)[1:])
+    k = 0
+    print("here, we have k, i = ", k, idx)
+    for inter in inters:
+        new_inter = ''
+        j = 0
+        for i, _ in enumerate(v):
+            if myfun.arguments[i].sym in arg.ac.atoms():
+                new_inter += inter[j]
+                j += 1
+            else:
+                new_inter += 'u'
+        if satisfies(v, new_inter, arg):
+            print("k, i", k, idx)
+            if k == idx:
+                return new_inter
+            else:
+                print("k, i, new_inter", k, idx, new_inter)
+                k += 1
+    print("no msat found, k = ", k)
+    return ''
+
+
+def find_new(i, v, a_prime, choice):
     msats = {}
     for a in a_prime:
         phi_a = myfun.phi(a.ac, v)
@@ -98,16 +191,28 @@ def find_new(v, a_prime, choice):
             m = [myfun.just_one_gamma(v, a)]
             msats[f"{a.name}"] = m
         else:
+            # msat_comp_6(v, a)
+            # New idea
+            if choice == 5:
+                m = [msat_comp_5(i, v, a)]
+                msats[f"{a.name}"] = m
+                print(m)
+            # Smart computation over all arguments
+            elif choice == 4:
+                msats[f"{a.name}"] = msat_comp_4(v, a)
             # Computation over all arguments
-            if choice == 2:
-                msats[f"{a.name}"] = gen_msats(v, a)
+            elif choice == 3:
+                msats[f"{a.name}"] = msat_comp_3(v, a)
+            # Computation over parents of a in A'
+            elif choice == 2:
+                msats[f"{a.name}"] = msat_comp_2(v, a)
             # One SAT (not minimal) randomly generated over parents of a in A'
-            elif choice == 1:
+            elif choice == 0:
                 m = [msat_smart(v, a)]
                 msats[f"{a.name}"] = m
             # Smarter computation over parents of a in A'
-            elif choice == 0:
-                msats[f"{a.name}"] = msat_comp(v, a)
+            elif choice == 1:
+                msats[f"{a.name}"] = msat_comp_1(v, a)
     result = ext.combine_msats(msats)
     num = len(result[f"{a_prime[0].name}"])
     return num, result

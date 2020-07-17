@@ -78,7 +78,7 @@ def main(argv):
 
     # user_in = input("Please enter file name: ")
     # print(sys.argv[1])
-    user_in = 'adfex7'
+    user_in = 'adfex14'
     path = part + '/ex/' + user_in
     # print(path)
 
@@ -108,11 +108,8 @@ def main(argv):
         myfun.print_full_args(myfun.arguments)
         print("-------------------")
 
-    # choice = input("How should the program find mSATs? 0 = computation 1 = completely random")
-
     # initial_claim = get_claim()
-    initial_claim = 'uut'
-    # initial_claim = 't' + (myfun.size-1)*'u'
+    initial_claim = 't' + (myfun.size-1)*'u'
     a_prime = myfun.check_info(initial_claim, myfun.size*'u')[0]
     xprint(f"v_0 = {initial_claim}")
 
@@ -121,7 +118,8 @@ def main(argv):
     winner = ''
 
     def get_m():
-        n.num, n.msats = msat_fun.find_new(n.data, a_prime, alg)
+        n.num, n.msats = msat_fun.find_new(n.i, n.data, a_prime, alg)
+        # print("for", n.i, n.data, "n.num is", n.num)
         i = random.choice(range(n.num))
         forward.msat_rand = {}
         for a in a_prime:
@@ -130,6 +128,10 @@ def main(argv):
         n.num -= 1
         n.black_list.append(forward.msat_rand)
     get_m()
+    # if alg == 5:
+    #     m = msat_fun.find_new(n.i, n.data, a_prime, alg)[1]
+    #     for a in a_prime:
+    #         forward.msat_rand[f'{a.name}'] = m[f'{a.name}'][0]
 
     update = forward.forward_step(initial_claim, a_prime)
     n.add_child(update)
@@ -157,11 +159,21 @@ def main(argv):
 
                 a_prime = myfun.check_info(v=n.data, oldv=par)[0]
 
-                if alg == 3:
-                    while try_msat not in n.black_list:
-                        try_msat = msat_fun.find_new(n.data, a_prime, 3)[1]
-                elif alg == 1:
-                    trying_msat = msat_fun.find_new(n.data, a_prime, 1)[1]
+                if alg == 5:
+                    try_msat = {}
+                    m = msat_fun.find_new(n.i + 1, n.data, a_prime, alg)
+                    for a in a_prime:
+                        try_msat[f'{a.name}'] = m[1][f'{a.name}'][0]
+                    j = 1
+                    while m[0] == 0:
+                        j += 1
+                        m = msat_fun.find_new(n.i + j, n.data, a_prime, alg)
+                        for a in a_prime:
+                            try_msat[f'{a.name}'] = m[1][f'{a.name}'][0]
+                    if try_msat not in n.black_list:
+                        found_msat = True
+                elif alg == 0:
+                    trying_msat = msat_fun.find_new(n.i, n.data, a_prime, 1)[1]
                     try_msat = {}
                     for a in a_prime:
                         try_msat[f'{a.name}'] = trying_msat[f'{a.name}'][0]
@@ -198,10 +210,10 @@ def main(argv):
         elif found:
             winner = n.data
             xprint("Agreement found! P wins the game.")
+            # print(winner)
             break
         else:
             xprint("No contradiction or agreement found, will apply forward move")
-
             get_m()
 
             update = forward.forward_step(n.data, a_prime)
@@ -229,32 +241,32 @@ def main(argv):
                     string = string + myfun.arguments[j].name + '->' + w
             print("Interpretation: %s " % string+'}')
         print("-------------------")
-        print("Bye!")
-    if winner != '':
-        print("YES")
-    else:
+        if winner != '':
+            print("YES")
+        else:
+            print("NO")
+    if winner == '':
         print("NO")
 
 
 if __name__ == '__main__':
-    # myfun.pc = True
-    # start_time = time.time()
-    # main(sys.argv)
-    # t = time.time() - start_time
-    # print("--- %s seconds ---" % t)
-
-    # alg = int(input("Which algorithm for finding mSAT would you like to use? 0 = smart computation 1 = random 2 = dumb computation"))
+    # alg = int(input("Which algorithm for finding mSAT would you like to use? 0 = random 1 = parents+smart 2 = parents 3 = all 4 = all+smart"))
     # choice = int(input("How many times would you like to run the program? "))
-    alg = 2
-    choice = 20
     # if input("Would you like to print?") == 'y':
     #     myfun.pc = True
+    alg = 3
+    choice = 1
+    # myfun.pc = True
+    print(alg, choice)
     if choice < 1:
         print("Okay, bye")
     elif choice == 1:
         start_time = time.time()
         main(sys.argv)
         t = time.time() - start_time
+        f = open("big1.txt", "a")
+        f.write(f"{str(t)}\n")
+        f.close()
         print("--- %s seconds ---" % t)
     else:
         times = []
@@ -263,7 +275,7 @@ if __name__ == '__main__':
             start_time = time.time()
             main(sys.argv)
             t = time.time() - start_time
-            # print(t)
+            print(t)
             times.append(t)
             c += 1
         # print(times)
