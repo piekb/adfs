@@ -76,8 +76,9 @@ def main(argv):
     cur_path = os.getcwd()
     part = os.path.split(cur_path)[0]
 
-    user_in = input("Please enter file name: ")
-    # print(sys.argv[1])
+    # user_in = input("Please enter file name: ")
+    print(sys.argv[1])
+    user_in = sys.argv[1]
     # user_in = 'adfex7'
     path = part + '/ex/' + user_in
     # print(path)
