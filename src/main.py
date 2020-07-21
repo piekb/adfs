@@ -250,11 +250,11 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    # alg = int(input("Which algorithm for finding mSAT would you like to use? 0 = random 1 = parents+smart 2 = parents 3 = all 4 = all+smart"))
+    alg = int(input("Which algorithm for finding mSAT would you like to use? 0 = random 1 = parents+smart 2 = parents 3 = all 4 = all+smart"))
     # choice = int(input("How many times would you like to run the program? "))
     # if input("Would you like to print?") == 'y':
     #     myfun.pc = True
-    alg = 3
+    # alg = 3
     choice = 1
     # myfun.pc = True
     print(alg, choice)
