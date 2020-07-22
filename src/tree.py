@@ -1,26 +1,14 @@
-deltas = ['tfu', 'ffu', 'ttt']
+# This file describes the Tree structure
 
+
+# A Root has data (interpretation string), children,
+# i: an index of the child it should visit in the backward move,
+# a list of msats, and the number of msats in the list.
 class Root(object):
     def __init__(self, data):
         self.data = data
         self.children = []
         self.i = 0
-        self.visited = False
-        self.black_list = []
-
-    def add_child(self, data):
-        obj = Node(data, self)
-        self.children.append(obj)
-
-
-class Node(object):
-    def __init__(self, data, parent):
-        self.data = data
-        self.i = 0
-        self.children = []
-        self.visited = False
-        self.parent = parent
-        self.black_list = []
         self.msats = {}
         self.num = 0
 
@@ -29,21 +17,23 @@ class Node(object):
         self.children.append(obj)
 
 
+# A Node has everything a Root has, plus a parent node.
+class Node(object):
+    def __init__(self, data, parent):
+        self.data = data
+        self.i = 0
+        self.children = []
+        self.parent = parent
+        self.msats = {}
+        self.num = 0
+
+    def add_child(self, data):
+        obj = Node(data, self)
+        self.children.append(obj)
+
+
+# Recursive definition of Depth-first pre-order traversal
 def traverse(n, i):
-    """Depth-first pre-order."""
     print((i*'--'), i, n.data)
     for child in n.children:
         traverse(child, i+1)
-
-
-def test_tree():
-    n = Root('uuu')
-    for m in deltas:
-        n.add_child(m)
-
-    for c in n.children:
-        print(c.data, c.parent.data)
-
-if __name__ == '__main__':
-    test_tree()
-

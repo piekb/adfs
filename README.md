@@ -1,20 +1,28 @@
 # adfs
-Bachelor Project on Abstract Dialectical Frameworks.
+Bachelor Project on Discussion Game for Abstract Dialectical Frameworks.
 
 # src
 Source code. Make sure you are in this folder! Otherwise you cannot run. 
-To run: python main.py
-You will be asked to enter an input file name and initial claim. 
 
+To run: python main.py <file> <arg> <value> <algorithm> p
+- file: should be the name of a file in folder "ex". 
+- arg: name of argument of initial claim, for example
+- value: truth value of argument in initial claim
+- algorithm: 1 is smart computation over parents, 2 is normal computation over parents
+- p (OPTIONAL): print steps of the game, search tree, and winning interpretation. 
+
+Examples (used in the thesis for testing):
+python main.py adfex14 a t 1
+python main.py adfex7 c t 1 -p
+
+
+Files:
 - main.py: main script. Reads input, then runs general algorithm of the game. 
 - tree.py: Tree structure functions.
 - myfun.py: Functions that are used in a variety of other scripts
 - msat_fun.py: Functions relating to finding mSATs. 
 - forward.py: Functions relating to the forward move. 
-- ext.py: Some functions I got from the internet, used for development. 
-	  Two functions are actually used in the code; I will probably move those to myfun.py later. 
-- dev.py: Some commented out parts of code used for development only. 
-	  Just for a back-up in between Git pushes. 
+- ext.py: Some recursive functions used by functions in msat_fun.py. 
 
 # ex
 Location of example ADF input files. Format:
@@ -27,10 +35,5 @@ ac(a,f).	... the acceptance condition of a is f,
 		    imp(p,q), iff(p,q), where p and q
 		    are subformulae.
 
-
-# k-adf
-K++ ADF, for reference. Altered SolverTypes.h.
-cd src
-To compile: make
-To run: ./k++adf <adm/prf> <options> <file>
-Files are in ../ex
+The last line of the file should be empty. 
+Argument names cannot start with an integer, but adding an "a" before each integer solves the problem. 

@@ -1,6 +1,6 @@
 from sympy import simplify
 
-# Global variables, classes, and functions
+# This file contains global variables and functions used in other files.
 arguments = []
 size = 0
 pc = False
@@ -19,18 +19,16 @@ def check_info(v, oldv):
             if v[i] != oldv[i]:
                 contra = True
     if len(a_prime) == 0:
-        # Actually, not found if contradiction. Easier to write it this way though.
+        # Actually, not found if contradiction.
         found = True
     return a_prime, contra, found
 
 
-# Returns an interpretation with only arg -> value, and all other args -> u
-# Value is 'x', arg is name
-def make_one(value, arg):
+# Returns an interpretation with only arg -> value and all other args -> u
+def make_one(value, arg_name):
     u = size * 'u'
-    arg_in = dex(arg)
+    arg_in = dex(arg_name)
     new = u[:arg_in] + value + u[arg_in:-1]
-
     return new
 
 
@@ -38,8 +36,6 @@ def make_one(value, arg):
 def just_one_gamma(v, a):
     new = find_in(gamma(v), a)
     gam = make_one(new, a.name)
-    # if gam.count('u') == size:
-    #     print("Gamma is also undecided")
     return gam
 
 
@@ -95,15 +91,3 @@ def find_from_sym(s):
 def print_full_args(set):
     for a in set:
         print(f"phi({a.name}): {a.ac}")
-
-
-# Prints all arguments in given set
-def print_args(set):
-    for a in set:
-        print(a.name)
-
-
-# Prints the acceptance conditions of all arguments in given set
-def print_acs(set):
-    for a in set:
-        print(a)

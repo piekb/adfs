@@ -4,7 +4,7 @@ s(c).
 s(d).
 s(e).
 ac(a,and(b,c)).
-ac(b,or(d,e,)).
+ac(b,or(d,e)).
 ac(c,or(neg(d),e)).
 ac(d,d).
 ac(e,e).

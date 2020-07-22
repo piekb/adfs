@@ -1,6 +1,6 @@
 s(a).
 s(b).
 s(c).
-ac(a,or(b,c)).
+ac(a,c(f)).
 ac(b,b).
-ac(c,c(f)).
+ac(c,or(a,b)).

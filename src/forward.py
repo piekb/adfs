@@ -1,37 +1,28 @@
-import sys
-import os
-import json
 import sympy
 from sympy import *
-import re
 import myfun
 from myfun import *
-import ext
 from ext import *
 
-# msat = {}
-msat_rand = {}
+msat = {}
 
 
 def find_msat(a):
-    # return msat_rand
-    return msat_rand[f"{a.name}"]
+    return msat[f"{a.name}"]
 
 
-# Returns whether there is any conflict in the "rest" of a-prime without the first defined value.
-# msat_ai: str, a_prime: [argument], a: argument
+# Returns whether there is any conflict in the "rest" of a-prime
+# without the first defined value. a is of class Argument
 def no_conflict(val_ai, a_prime, a):
-    # val_ai = myfun.find_in(msat_ai, a)
     for a_j in a_prime:
         msat_aj = find_msat(a_j)
         val_aj = myfun.find_in(msat_aj, a)
         if val_aj != 'u' and val_ai != 'u' and val_aj != val_ai:
-            print(f'Found a conflict: val_ai = {val_ai}, val_aj = {val_aj} for arg {a.name} on arg {a.name}')
             return False
     return True
 
 
-# Argument is in a-prime
+# Third case of delta
 def third(v, a_prime, a):
     phi_a = myfun.phi(a.ac, v)
     msat_arg = find_msat(a)
@@ -42,13 +33,12 @@ def third(v, a_prime, a):
             parent = myfun.find_from_sym(c)
             val = myfun.find_in(msat_arg, parent)
             if not no_conflict(val, a_prime, parent):
-                print("- conflict found -")
                 return False
     return True
 
 
-def fourth(v, a_prime, a):
-    # print("type(a)=", type(a))
+# Fourth case of delta(v, mSAT_A')(a)
+def fourth(a_prime, a):
     for a_i in a_prime:
         msat_ai = find_msat(a_i)
         val = myfun.find_in(msat_ai, a)
@@ -59,30 +49,32 @@ def fourth(v, a_prime, a):
     return False, 0
 
 
+# Main function delta of the forward move.
 def delta(v, a_prime, a):
     update = ''
     truth_val = myfun.find_in(v, a)
     if truth_val == 't' or truth_val == 'f':
         if not (a in a_prime):
-            # print("first condition delta")
+            # First case of delta
             update = truth_val
-        elif (myfun.phi(a.ac, v) == True and truth_val == 't') or (myfun.phi(a.ac, v) == False and truth_val == 'f'):
-            # print("second condition delta")
+        elif (myfun.phi(a.ac, v) == True and truth_val == 't') or \
+                (myfun.phi(a.ac, v) == False and truth_val == 'f'):
+            # Second case of delta
             update = truth_val
         elif third(v, a_prime, a):
-            # print("third condition delta")
+            # Third case of delta
             update = truth_val
         else:
-            # print("fifth condition delta")
+            # Fifth case of delta
             update = 'u'
     elif truth_val == 'u':
-        four = fourth(v, a_prime, a)
+        four = fourth(a_prime, a)
         if four[0]:
-            # print("fourth condition delta")
+            # Fourth case of delta
             msat_f = four[1]
             update = myfun.find_in(msat_f, a)
         else:
-            # print("fifth condition delta")
+            # Fifth case of delta
             update = 'u'
 
     return update
@@ -92,7 +84,5 @@ def delta(v, a_prime, a):
 def forward_step(v, a_prime):
     out = ''
     for a in myfun.arguments:
-        # print(f"Delta of argument {a.name}")
         out = out + delta(v, a_prime, a)
-    # print("Final delta:", out)
     return out
