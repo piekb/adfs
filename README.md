@@ -17,7 +17,7 @@ To run: python main.py <file> <arg> <value> <algorithm> p
 
 Examples (used in the thesis for testing):
 python main.py adfex14 a t 1
-python main.py adfex7 c t 1 -p
+python main.py adfex7 c t 1 p
 
 
 Files:
