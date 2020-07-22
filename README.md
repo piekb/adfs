@@ -1,6 +1,10 @@
 # adfs
 Bachelor Project on Discussion Game for Abstract Dialectical Frameworks.
 
+# requirements.txt
+Installs all required packages for you. Run the following in folder 'adfs':
+pip install -r requirements.txt
+
 # src
 Source code. Make sure you are in this folder! Otherwise you cannot run. 
 
